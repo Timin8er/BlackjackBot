@@ -2,6 +2,7 @@
 from PyQt5.QtCore import QThread, pyqtSignal
 from util.enums import playerState
 
+import time
 
 class playerHitHoldProcessor(QThread):
 
@@ -13,16 +14,18 @@ class playerHitHoldProcessor(QThread):
         self.player_bots = player_bots
 
         self.update_tempo = 10
-        self.has_remaing_In = True
+        self.remaing_In = 100
 
 
 
     def run(self):
-        self.has_remaing_In = False
+        self.remaing_In = 0
         for i in range(len(self.player_bots)):
             player = self.player_bots[i]
 
             if player.hit_or_hold() == playerState.In:
-                self.has_remaing_In = True
+                self.remaing_In += 1
 
             self.progress_update.emit(i+1)
+
+            time.sleep(0.05)

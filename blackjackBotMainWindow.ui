@@ -119,7 +119,7 @@
       <item>
        <widget class="QProgressBar" name="progressBar">
         <property name="value">
-         <number>25</number>
+         <number>0</number>
         </property>
        </widget>
       </item>
@@ -252,8 +252,20 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuSimulation">
+    <property name="title">
+     <string>Simulation</string>
+    </property>
+    <addaction name="actionReset"/>
+   </widget>
+   <addaction name="menuSimulation"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionReset">
+   <property name="text">
+    <string>Reset</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

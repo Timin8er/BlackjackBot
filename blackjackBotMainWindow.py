@@ -53,7 +53,7 @@ class Ui_MainWindow(object):
         self.label.setObjectName("label")
         self.horizontalLayout_2.addWidget(self.label)
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar.setProperty("value", 25)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
         self.horizontalLayout_2.addWidget(self.progressBar)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -116,10 +116,16 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
+        self.menuSimulation = QtWidgets.QMenu(self.menubar)
+        self.menuSimulation.setObjectName("menuSimulation")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.actionReset = QtWidgets.QAction(MainWindow)
+        self.actionReset.setObjectName("actionReset")
+        self.menuSimulation.addAction(self.actionReset)
+        self.menubar.addAction(self.menuSimulation.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -142,6 +148,8 @@ class Ui_MainWindow(object):
         self.print_tb.setText(_translate("MainWindow", "TextLabel"))
         self.label_best_money.setText(_translate("MainWindow", "Best Money"))
         self.print_best_money.setText(_translate("MainWindow", "TextLabel"))
+        self.menuSimulation.setTitle(_translate("MainWindow", "Simulation"))
+        self.actionReset.setText(_translate("MainWindow", "Reset"))
 
 
 if __name__ == "__main__":

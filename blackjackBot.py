@@ -77,6 +77,10 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.simulation_controller = simulationController(self)
         self.total_bots = self.simulation_controller.player_bots
 
+        # simulation menu controled
+        self.actionReset.triggered.connect(self.clear_board)
+
+
         # controll button icons
         self.btn_pause.setIcon(QIcon('icons/pause.png'))
         self.btn_step.setIcon(QIcon('icons/skip-forward.png'))
@@ -144,6 +148,19 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
     # ==========================================================================
     # actions for controlling the playspace
     def clear_board(self):
+        # remove cards from ui
+        for i in self._dealer_cards:
+            if i['object']:
+                self.hlayout_dealers_hand.removeWidget(i['object'])
+                i['object'].deleteLater()
+                i['object'] = None
+        for i in self._player_cards:
+            if i['object']:
+                self.hlayout_players_hand.removeWidget(i['object'])
+                i['object'].deleteLater()
+                i['object'] = None
+
+
         self.progressBar.setProperty("value", 0)
         self._dealer_cards = []
         self._player_cards = []

@@ -6,6 +6,8 @@ from dealerBot import dealerBot
 from playerBot import playerBot
 from playerHitHoldProcessor import playerHitHoldProcessor
 
+import time
+
 class simulationController(QObject):
 
     sim_state = simState.Paused
@@ -16,7 +18,7 @@ class simulationController(QObject):
         self.resume_at = self.state_new_game
 
         self.player_bots = []
-        for i in range(10):
+        for i in range(100):
             self.player_bots.append(playerBot(self.game_ui))
 
         self.dealer_bot = dealerBot(self)
@@ -67,11 +69,13 @@ class simulationController(QObject):
         """
         Reset everything to the beginning of a game
         """
+        print ('new game')
         self.game_ui.clear_board()
         self.game_ui.deal_to_dealer()
         self.game_ui.deal_to_player()
-        self.game_ui.clear_board()
+        print ('starting with: %s' % self.game_ui.player_total())
 
+        time.sleep(1)
 
         if self.sim_state == simState.Step:
             self.set_sim_state(simState.Paused)
@@ -84,16 +88,20 @@ class simulationController(QObject):
         """
         Iterate the players game once, determine the next step
         """
+        # print ('player turn')
         self.game_ui.deal_to_player()
+        print ('player turn: %s' % self.game_ui.player_total())
 
         self.player_hit_hold_processor.start()
 
 
     def state_player_turn_end(self):
+        time.sleep(1)
+
         if self.sim_state == simState.Step:
             self.set_sim_state(simState.Paused)
         else:
-            if self.player_hit_hold_processor.has_remaing_In:
+            if self.player_hit_hold_processor.remaing_In:
                 self.state_player_turn()
             else:
                 self.state_player_run_complete()
