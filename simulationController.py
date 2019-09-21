@@ -75,6 +75,9 @@ class simulationController(QObject):
     def generate_bot(self):
         return playerBot(self.game_ui)
 
+
+
+
     # ==========================================================================
     # Simulation state machine
 
@@ -109,7 +112,7 @@ class simulationController(QObject):
 
 
     def state_player_turn_end(self):
-        print (self.game_ui.player_total(), self.player_hit_hold_processor.remaing_in)
+        # print (self.game_ui.player_total(), self.player_hit_hold_processor.remaing_in)
         if self.player_hit_hold_processor.remaing_in and self.game_ui.player_total() < 22:
             if self.sim_state == simState.Step or self.sim_state == simState.Paused:
                 self.resume_at = self.state_player_turn

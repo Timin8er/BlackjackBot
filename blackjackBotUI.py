@@ -5,6 +5,9 @@ from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import pyqtSignal, QRect
 
+import pyqtgraph
+import numpy
+
 from simulationController import simulationController
 
 from blackjackBotMainWindow import Ui_MainWindow
@@ -104,6 +107,15 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         self._dealer_total = 0
         self._player_total = 0
+
+        # add graphs
+        self.fitness_history = []
+        self.fitness_history_recent = []
+
+        self.current_fitness_plot = pyqtgraph.PlotWidget(title = 'Fitness')
+        self.verticalLayout.insertWidget(2, self.current_fitness_plot)
+        self.fitness_history_plot = pyqtgraph.PlotWidget(title = 'History')
+        self.verticalLayout.insertWidget(3, self.fitness_history_plot)
 
 
 
@@ -230,7 +242,22 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
 
     def update_data_display(self):
-        pass
+        fit = []
+        most = -1000000000
+        for bot in self.simulation_controller.player_bots:
+            fit.append(bot.fitness)
+            if bot.fitness > most:
+                most = bot.fitness
+
+        self.fitness_history.append(most)
+        self.fitness_history_recent.append(most)
+        if len(self.fitness_history_recent) > 100:
+            self.fitness_history_recent.pop(0)
+
+        self.current_fitness_plot.clear()
+        self.current_fitness_plot.plot(fit, symbol='o', pen=None)
+        self.fitness_history_plot.clear()
+        self.fitness_history_plot.plot(self.fitness_history_recent)
 
 
     def update_n_games(self, n : int):
