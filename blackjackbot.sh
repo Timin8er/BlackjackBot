@@ -4,4 +4,4 @@ if [ "$1" == "-c" ]; then
   pyuic5 -x blackjackBotMainWindow.ui -o blackjackBotMainWindow.py
   echo "done, starting blackjackBot"
 fi
-python3 blackjackbotUI.py
+python blackjackbotUI.py

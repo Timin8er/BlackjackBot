@@ -6,7 +6,7 @@ class simState(Enum):
     Paused = 0
     Play = 1
     Step = 2
-    StepGame = 3
+    StepGames = 3
 
 class playerState(Enum):
     Out = 0

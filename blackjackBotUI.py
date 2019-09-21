@@ -233,6 +233,14 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         pass
 
 
+    def update_n_games(self, n : int):
+        self.lcd_n_games.setProperty("intValue", n)
+
+
+    def get_step_games(self):
+        return self.spinbox_n_games.value()
+
+
 
 
 

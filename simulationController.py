@@ -27,6 +27,9 @@ class simulationController(QObject):
         self.player_hit_hold_processor.finished.connect(self.state_player_turn_end)
         self.player_hit_hold_processor.progress_update.connect(self.game_ui.update_progress)
 
+        self.n_games = 0
+        self.step_n_games = 1
+
 
     def set_sim_state(self, new_state):
         self.sim_state = new_state
@@ -37,7 +40,7 @@ class simulationController(QObject):
             self.game_ui.action_play()
         elif new_state == simState.Step:
             self.game_ui.action_step()
-        elif new_state == simState.StepGame:
+        elif new_state == simState.StepGames:
             self.game_ui.action_step_game()
 
     # ==========================================================================
@@ -60,8 +63,9 @@ class simulationController(QObject):
 
 
     def action_step_game(self):
+        self.step_n_games = self.game_ui.get_step_games()
         if self.sim_state == simState.Paused:
-            self.set_sim_state(simState.StepGame)
+            self.set_sim_state(simState.StepGames)
         self.resume_at()
 
 
@@ -152,10 +156,22 @@ class simulationController(QObject):
         while len(self.player_bots) < 100:
             self.player_bots.append(self.generate_bot())
 
+        self.n_games += 1
+        self.game_ui.update_n_games(self.n_games)
         self.game_ui.update_data_display()
 
-        # if self.sim_state == simState.Play:
-        #     self.state_new_game()
-        # else:
-        self.resume_at = self.state_new_game
-        self.set_sim_state(simState.Paused)
+        # if we're stepping n games, tick down and process
+        if self.sim_state == simState.StepGames:
+            self.step_n_games -= 1
+            if self.step_n_games == 0:
+                self.resume_at = self.state_new_game
+                self.set_sim_state(simState.Paused)
+            else:
+                self.state_new_game()
+        # if normal play, continue
+        elif self.sim_state == simState.Play:
+            self.state_new_game()
+        # else, we're pausing
+        else:
+            self.resume_at = self.state_new_game
+            self.set_sim_state(simState.Paused)
