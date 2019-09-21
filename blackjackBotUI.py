@@ -112,9 +112,9 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.fitness_history = []
         self.fitness_history_recent = []
 
-        self.current_fitness_plot = pyqtgraph.PlotWidget(title = 'Fitness')
+        self.current_fitness_plot = pyqtgraph.PlotWidget(title = 'Current Bot Money')
         self.verticalLayout.insertWidget(2, self.current_fitness_plot)
-        self.fitness_history_plot = pyqtgraph.PlotWidget(title = 'History')
+        self.fitness_history_plot = pyqtgraph.PlotWidget(title = 'Most Fit Bot, History')
         self.verticalLayout.insertWidget(3, self.fitness_history_plot)
 
 
@@ -245,7 +245,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         fit = []
         most = -1000000000
         for bot in self.simulation_controller.player_bots:
-            fit.append(bot.fitness)
+            fit.append(bot.money)
             if bot.fitness > most:
                 most = bot.fitness
 
@@ -256,6 +256,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         self.current_fitness_plot.clear()
         self.current_fitness_plot.plot(fit, symbol='o', pen=None)
+
         self.fitness_history_plot.clear()
         self.fitness_history_plot.plot(self.fitness_history_recent)
 

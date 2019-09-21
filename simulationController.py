@@ -7,6 +7,7 @@ from playerBot import playerBot
 from playerHitHoldProcessor import playerHitHoldProcessor
 
 import time
+import numpy
 
 class simulationController(QObject):
 
@@ -19,7 +20,7 @@ class simulationController(QObject):
 
         self.player_bots = []
         for i in range(100):
-            self.player_bots.append(self.generate_bot())
+            self.player_bots.append(playerBot(self.game_ui))
 
         self.dealer_bot = dealerBot(self, game_ui)
 
@@ -72,8 +73,8 @@ class simulationController(QObject):
     # ==========================================================================
     # bot stuff
 
-    def generate_bot(self):
-        return playerBot(self.game_ui)
+    def generate_bot(self, parent_bot):
+        return playerBot(self.game_ui, parent_bot)
 
 
 
@@ -155,9 +156,14 @@ class simulationController(QObject):
             if bot.money <= 0:
                 self.player_bots.remove(bot)
 
+        # sort bots by fitness
+        self.player_bots.sort(key=lambda x: x.fitness, reverse=True)
+
         # refill bots
         while len(self.player_bots) < 100:
-            self.player_bots.append(self.generate_bot())
+            # get fittest bot with deviation
+            dev = int(abs(numpy.random.normal(0,5)))
+            self.player_bots.append(self.generate_bot(self.player_bots[dev]))
 
         self.n_games += 1
         self.game_ui.update_n_games(self.n_games)

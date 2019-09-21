@@ -11,7 +11,7 @@ class playerBot(QObject):
 
         self.board_controller = board_controller
 
-        self.money = 50
+        self.money = 500
         self.fitness = 0
         self.games_won = 0
         self.games_lost = 0
@@ -65,4 +65,5 @@ class playerBot(QObject):
 
 
     def recalc_fitness(self):
+        # self.fitness = self.games_won
         self.fitness = self.games_won / self.games_played
