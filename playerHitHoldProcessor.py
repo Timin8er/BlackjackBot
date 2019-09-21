@@ -19,7 +19,12 @@ class playerHitHoldProcessor(QThread):
 
 
     def run(self):
+<<<<<<< refs/remotes/origin/development
         self.remaing_In = 0
+=======
+        self.has_remaing_In = False
+        # print(len(self.player_bots))
+>>>>>>> Completed the loop
         for i in range(len(self.player_bots)):
             player = self.player_bots[i]
 

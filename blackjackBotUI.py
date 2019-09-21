@@ -77,10 +77,6 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.simulation_controller = simulationController(self)
         self.total_bots = self.simulation_controller.player_bots
 
-        # simulation menu controled
-        self.actionReset.triggered.connect(self.clear_board)
-
-
         # controll button icons
         self.btn_pause.setIcon(QIcon('icons/pause.png'))
         self.btn_step.setIcon(QIcon('icons/skip-forward.png'))
@@ -148,22 +144,17 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
     # ==========================================================================
     # actions for controlling the playspace
     def clear_board(self):
-        # remove cards from ui
-        for i in self._dealer_cards:
-            if i['object']:
-                self.hlayout_dealers_hand.removeWidget(i['object'])
-                i['object'].deleteLater()
-                i['object'] = None
-        for i in self._player_cards:
-            if i['object']:
-                self.hlayout_players_hand.removeWidget(i['object'])
-                i['object'].deleteLater()
-                i['object'] = None
-
-
         self.progressBar.setProperty("value", 0)
+
+        for i in self._dealer_cards:
+            i['object'].deleteLater()
+        for i in self._player_cards:
+            i['object'].deleteLater()
+
         self._dealer_cards = []
         self._player_cards = []
+        self._dealer_total = 0
+        self._player_total = 0
 
         for i in self.deck:
             i['in_play'] = False
@@ -216,6 +207,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.hlayout_players_hand.insertWidget(self.hlayout_players_hand.count()-1, self.generate_card_widget(new_card))
 
         self._player_total= self.cards_total(self._player_cards)
+        # print (self._player_total)
 
 
     def player_total(self):
@@ -237,7 +229,8 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.progressBar.setProperty("value", n)
 
 
-
+    def update_data_display(self):
+        pass
 
 
 

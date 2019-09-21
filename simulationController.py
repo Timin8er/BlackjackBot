@@ -19,9 +19,13 @@ class simulationController(QObject):
 
         self.player_bots = []
         for i in range(100):
+<<<<<<< refs/remotes/origin/development
             self.player_bots.append(playerBot(self.game_ui))
+=======
+            self.player_bots.append(self.generate_bot())
+>>>>>>> Completed the loop
 
-        self.dealer_bot = dealerBot(self)
+        self.dealer_bot = dealerBot(self, game_ui)
 
         self.player_hit_hold_processor = playerHitHoldProcessor(self.player_bots)
         self.player_hit_hold_processor.finished.connect(self.state_player_turn_end)
@@ -65,6 +69,15 @@ class simulationController(QObject):
         self.resume_at()
 
 
+    # ==========================================================================
+    # bot stuff
+
+    def generate_bot(self):
+        return playerBot(self.game_ui)
+
+    # ==========================================================================
+    # Simulation state machine
+
     def state_new_game(self):
         """
         Reset everything to the beginning of a game
@@ -73,11 +86,16 @@ class simulationController(QObject):
         self.game_ui.clear_board()
         self.game_ui.deal_to_dealer()
         self.game_ui.deal_to_player()
+<<<<<<< refs/remotes/origin/development
         print ('starting with: %s' % self.game_ui.player_total())
 
         time.sleep(1)
 
         if self.sim_state == simState.Step:
+=======
+
+        if self.sim_state == simState.Step or self.sim_state == simState.Paused:
+>>>>>>> Completed the loop
             self.set_sim_state(simState.Paused)
             self.resume_at = self.state_player_turn
         else:
@@ -96,20 +114,56 @@ class simulationController(QObject):
 
 
     def state_player_turn_end(self):
-        time.sleep(1)
+        if self.player_hit_hold_processor.has_remaing_In and self.game_ui.player_total() < 22:
+            if self.sim_state == simState.Step or self.sim_state == simState.Paused:
+                self.resume_at = self.state_player_turn
+                self.set_sim_state(simState.Paused)
+            else:
+                self.state_player_turn()
+        else:
+            if self.sim_state == simState.Step or self.sim_state == simState.Paused:
+                self.resume_at = self.state_dealer_run
+                self.set_sim_state(simState.Paused)
+            else:
+                self.state_dealer_run()
 
-        if self.sim_state == simState.Step:
+
+    def state_dealer_run(self):
+        self.dealer_bot.run()
+
+        if self.sim_state == simState.Step or self.sim_state == simState.Paused:
+            self.resume_at = self.state_game_end
             self.set_sim_state(simState.Paused)
         else:
-            if self.player_hit_hold_processor.remaing_In:
-                self.state_player_turn()
-            else:
-                self.state_player_run_complete()
+            self.state_game_end()
 
 
-    def state_player_run_complete(self):
-        pass
+    def state_game_end(self):
 
+        # w/t/l
+        for bot in self.player_bots:
+            if bot.card_total > 21:
+                bot.lose_game()
+            elif bot.card_total < self.game_ui.dealer_total():
+                bot.lose_game()
+            elif bot.card_total == self.game_ui.dealer_total():
+                bot.tie_game()
+            elif bot.card_total > self.game_ui.dealer_total():
+                bot.win_game()
 
-    def state_game_complete(self):
-        pass
+        # delete broke bots
+        for bot in reversed(self.player_bots):
+            if bot.money <= 0:
+                self.player_bots.remove(bot)
+
+        # refill bots
+        while len(self.player_bots) < 100:
+            self.player_bots.append(self.generate_bot())
+
+        self.game_ui.update_data_display()
+
+        # if self.sim_state == simState.Play:
+        #     self.state_new_game()
+        # else:
+        self.resume_at = self.state_new_game
+        self.set_sim_state(simState.Paused)

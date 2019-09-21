@@ -15,6 +15,7 @@ class playerBot(QObject):
         self.games_won = 0
         self.games_lost = 0
         self.games_played = 0
+        self.card_total = 0
 
         self.reset()
 
@@ -37,7 +38,7 @@ class playerBot(QObject):
         self.games_won += 1
         self.money += 1
 
-        self.fitness = self.games_won / self.games_lost
+        self.recalc_fitness()
 
 
     def lose_game(self):
@@ -45,4 +46,14 @@ class playerBot(QObject):
         self.games_lost += 1
         self.money -= 1
 
-        self.fitness = self.games_won / self.games_lost
+        self.recalc_fitness()
+
+
+    def tie_game(self):
+        self.games_played += 1
+
+        self.recalc_fitness()
+
+
+    def recalc_fitness(self):
+        self.fitness = self.games_won / self.games_played
