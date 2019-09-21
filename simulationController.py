@@ -44,6 +44,7 @@ class simulationController(QObject):
         elif new_state == simState.StepGames:
             self.game_ui.action_step_game()
 
+
     # ==========================================================================
     # user actions
 
@@ -54,20 +55,22 @@ class simulationController(QObject):
     def action_play(self):
         if self.sim_state == simState.Paused:
             self.set_sim_state(simState.Play)
-        self.resume_at()
+            self.resume_at()
 
 
     def action_step(self):
-        if self.sim_state == simState.Paused:
-            self.set_sim_state(simState.Step)
-        self.resume_at()
+        t = self.sim_state
+        self.set_sim_state(simState.Step)
+        if t == simState.Paused:
+            self.resume_at()
 
 
     def action_step_game(self):
         self.step_n_games = self.game_ui.get_step_games()
-        if self.sim_state == simState.Paused:
-            self.set_sim_state(simState.StepGames)
-        self.resume_at()
+        t = self.sim_state
+        self.set_sim_state(simState.StepGames)
+        if t == simState.Paused:
+            self.resume_at()
 
 
     # ==========================================================================
