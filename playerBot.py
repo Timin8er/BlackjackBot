@@ -2,15 +2,16 @@
 from PyQt5.QtCore import QObject
 from util.enums import playerState
 
+import random
 
 class playerBot(QObject):
 
-    def __init__(self, board_controller):
+    def __init__(self, board_controller, parent_bot = None):
         QObject.__init__(self)
 
         self.board_controller = board_controller
 
-        self.money = 10
+        self.money = 500
         self.fitness = 0
         self.games_won = 0
         self.games_lost = 0
@@ -18,6 +19,14 @@ class playerBot(QObject):
         self.card_total = 0
 
         self.reset()
+
+        # randomize from parent
+        if parent_bot:
+            self.threshold = parent_bot.threshold + random.random() - 0.5
+        # completely random
+        else:
+            self.threshold = random.random() * 21
+
 
 
     def reset(self):
@@ -28,7 +37,7 @@ class playerBot(QObject):
     def hit_or_hold(self):
         if self.game_state == playerState.In:
             self.card_total = self.board_controller.player_total()
-            if self.card_total > 16:
+            if self.card_total > self.threshold:
                 self.game_state = playerState.Out
         return self.game_state
 
@@ -56,4 +65,5 @@ class playerBot(QObject):
 
 
     def recalc_fitness(self):
+        # self.fitness = self.games_won
         self.fitness = self.games_won / self.games_played

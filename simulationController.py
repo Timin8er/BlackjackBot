@@ -7,6 +7,7 @@ from playerBot import playerBot
 from playerHitHoldProcessor import playerHitHoldProcessor
 
 import time
+import numpy
 
 class simulationController(QObject):
 
@@ -19,7 +20,7 @@ class simulationController(QObject):
 
         self.player_bots = []
         for i in range(100):
-            self.player_bots.append(self.generate_bot())
+            self.player_bots.append(playerBot(self.game_ui))
 
         self.dealer_bot = dealerBot(self, game_ui)
 
@@ -43,6 +44,7 @@ class simulationController(QObject):
         elif new_state == simState.StepGames:
             self.game_ui.action_step_game()
 
+
     # ==========================================================================
     # user actions
 
@@ -53,27 +55,32 @@ class simulationController(QObject):
     def action_play(self):
         if self.sim_state == simState.Paused:
             self.set_sim_state(simState.Play)
-        self.resume_at()
+            self.resume_at()
 
 
     def action_step(self):
-        if self.sim_state == simState.Paused:
-            self.set_sim_state(simState.Step)
-        self.resume_at()
+        t = self.sim_state
+        self.set_sim_state(simState.Step)
+        if t == simState.Paused:
+            self.resume_at()
 
 
     def action_step_game(self):
         self.step_n_games = self.game_ui.get_step_games()
-        if self.sim_state == simState.Paused:
-            self.set_sim_state(simState.StepGames)
-        self.resume_at()
+        t = self.sim_state
+        self.set_sim_state(simState.StepGames)
+        if t == simState.Paused:
+            self.resume_at()
 
 
     # ==========================================================================
     # bot stuff
 
-    def generate_bot(self):
-        return playerBot(self.game_ui)
+    def generate_bot(self, parent_bot):
+        return playerBot(self.game_ui, parent_bot)
+
+
+
 
     # ==========================================================================
     # Simulation state machine
@@ -109,7 +116,7 @@ class simulationController(QObject):
 
 
     def state_player_turn_end(self):
-        print (self.game_ui.player_total(), self.player_hit_hold_processor.remaing_in)
+        # print (self.game_ui.player_total(), self.player_hit_hold_processor.remaing_in)
         if self.player_hit_hold_processor.remaing_in and self.game_ui.player_total() < 22:
             if self.sim_state == simState.Step or self.sim_state == simState.Paused:
                 self.resume_at = self.state_player_turn
@@ -152,9 +159,14 @@ class simulationController(QObject):
             if bot.money <= 0:
                 self.player_bots.remove(bot)
 
+        # sort bots by fitness
+        self.player_bots.sort(key=lambda x: x.fitness, reverse=True)
+
         # refill bots
         while len(self.player_bots) < 100:
-            self.player_bots.append(self.generate_bot())
+            # get fittest bot with deviation
+            dev = int(abs(numpy.random.normal(0,5)))
+            self.player_bots.append(self.generate_bot(self.player_bots[dev]))
 
         self.n_games += 1
         self.game_ui.update_n_games(self.n_games)
