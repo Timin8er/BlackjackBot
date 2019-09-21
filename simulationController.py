@@ -19,11 +19,7 @@ class simulationController(QObject):
 
         self.player_bots = []
         for i in range(100):
-<<<<<<< refs/remotes/origin/development
-            self.player_bots.append(playerBot(self.game_ui))
-=======
             self.player_bots.append(self.generate_bot())
->>>>>>> Completed the loop
 
         self.dealer_bot = dealerBot(self, game_ui)
 
@@ -82,20 +78,15 @@ class simulationController(QObject):
         """
         Reset everything to the beginning of a game
         """
-        print ('new game')
+        # print ('new game')
         self.game_ui.clear_board()
         self.game_ui.deal_to_dealer()
         self.game_ui.deal_to_player()
-<<<<<<< refs/remotes/origin/development
-        print ('starting with: %s' % self.game_ui.player_total())
 
-        time.sleep(1)
-
-        if self.sim_state == simState.Step:
-=======
+        for bot in self.player_bots:
+            bot.reset()
 
         if self.sim_state == simState.Step or self.sim_state == simState.Paused:
->>>>>>> Completed the loop
             self.set_sim_state(simState.Paused)
             self.resume_at = self.state_player_turn
         else:
@@ -108,13 +99,14 @@ class simulationController(QObject):
         """
         # print ('player turn')
         self.game_ui.deal_to_player()
-        print ('player turn: %s' % self.game_ui.player_total())
+        # print ('player turn: %s' % self.game_ui.player_total())
 
         self.player_hit_hold_processor.start()
 
 
     def state_player_turn_end(self):
-        if self.player_hit_hold_processor.has_remaing_In and self.game_ui.player_total() < 22:
+        print (self.game_ui.player_total(), self.player_hit_hold_processor.remaing_in)
+        if self.player_hit_hold_processor.remaing_in and self.game_ui.player_total() < 22:
             if self.sim_state == simState.Step or self.sim_state == simState.Paused:
                 self.resume_at = self.state_player_turn
                 self.set_sim_state(simState.Paused)
