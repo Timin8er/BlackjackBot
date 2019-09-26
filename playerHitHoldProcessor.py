@@ -23,9 +23,18 @@ class playerHitHoldProcessor(QThread):
         for i in range(len(self.player_bots)):
             player = self.player_bots[i]
 
-            if player.hit_or_hold() == playerState.In:
-                self.remaing_in += 1
+            if player.game_state == playerState.In:
+                if player.hit_or_hold() == playerState.In:
+                    self.remaing_in += 1
 
             self.progress_update.emit(i+1)
+
+            # if i == 5:
+            #     print ([
+            #         player.board_controller.player_total(),
+            #         player.board_controller.dealer_total()
+            #     ])
+            # if i % 10 == 0:
+            #     print (player.hit_or_hold())
 
             # time.sleep(0.05)

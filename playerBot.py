@@ -2,7 +2,10 @@
 from PyQt5.QtCore import QObject
 from util.enums import playerState
 
+from nuralNetLayer import nuralNetLayer
+
 import random
+import numpy
 
 class playerBot(QObject):
 
@@ -11,22 +14,18 @@ class playerBot(QObject):
 
         self.board_controller = board_controller
 
-        self.money = 500
+        self.money = 100
         self.fitness = 0
         self.games_won = 0
         self.games_lost = 0
         self.games_played = 0
         self.card_total = 0
+        self.nural_net = None
 
         self.reset()
 
-        # randomize from parent
         if parent_bot:
-            self.threshold = parent_bot.threshold + random.random() - 0.5
-        # completely random
-        else:
-            self.threshold = random.random() * 21
-
+            self.nural_net = nuralNetLayer(parent = parent_bot.nural_net)
 
 
     def reset(self):
@@ -35,10 +34,17 @@ class playerBot(QObject):
 
 
     def hit_or_hold(self):
-        if self.game_state == playerState.In:
-            self.card_total = self.board_controller.player_total()
-            if self.card_total > self.threshold:
-                self.game_state = playerState.Out
+        self.card_total = self.board_controller.player_total()
+
+        r = self.nural_net.feedforward([
+            self.card_total,
+            self.board_controller.dealer_total()
+        ])
+
+        if r[0] > 0.5:
+            self.game_state = playerState.In
+        else:
+            self.game_state = playerState.Out
         return self.game_state
 
 
@@ -65,5 +71,8 @@ class playerBot(QObject):
 
 
     def recalc_fitness(self):
-        # self.fitness = self.games_won
-        self.fitness = self.games_won / self.games_played
+        self.fitness = self.games_won
+        # self.fitness = self.games_won / self.games_played
+
+    def sigma(self, x):
+        return 1 / (1 + numpy.exp(-x))

@@ -4,6 +4,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from util.enums import simState, playerState
 from dealerBot import dealerBot
 from playerBot import playerBot
+from grandfatherPlayerBot import grandfatherPlayerBot
 from playerHitHoldProcessor import playerHitHoldProcessor
 
 import time
@@ -17,10 +18,15 @@ class simulationController(QObject):
         QObject.__init__(self)
         self.game_ui = game_ui
         self.resume_at = self.state_new_game
+        self.n_bots = 100
+
+        # generate grandfather bot
+        self.grandfather_bot = grandfatherPlayerBot(self.game_ui)
+        # print (self.grandfather_bot.nural_net.feedforward([16,99]))
 
         self.player_bots = []
-        for i in range(100):
-            self.player_bots.append(playerBot(self.game_ui))
+        for i in range(self.n_bots):
+            self.player_bots.append(playerBot(self.game_ui, self.grandfather_bot))
 
         self.dealer_bot = dealerBot(self, game_ui)
 
@@ -112,6 +118,7 @@ class simulationController(QObject):
         self.game_ui.deal_to_player()
         # print ('player turn: %s' % self.game_ui.player_total())
 
+        # print(self.game_ui.dealer_total(), self.game_ui.player_total())
         self.player_hit_hold_processor.start()
 
 
@@ -145,8 +152,11 @@ class simulationController(QObject):
 
         # w/t/l
         for bot in self.player_bots:
+
             if bot.card_total > 21:
                 bot.lose_game()
+            elif self.game_ui.dealer_total() > 21:
+                bot.win_game()
             elif bot.card_total < self.game_ui.dealer_total():
                 bot.lose_game()
             elif bot.card_total == self.game_ui.dealer_total():
@@ -163,7 +173,7 @@ class simulationController(QObject):
         self.player_bots.sort(key=lambda x: x.fitness, reverse=True)
 
         # refill bots
-        while len(self.player_bots) < 100:
+        while len(self.player_bots) < self.n_bots:
             # get fittest bot with deviation
             dev = int(abs(numpy.random.normal(0,5)))
             self.player_bots.append(self.generate_bot(self.player_bots[dev]))
