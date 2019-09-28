@@ -169,7 +169,7 @@ class Ui_MainWindow(object):
         self.btn_pause.setText(_translate("MainWindow", "Pause"))
         self.btn_step.setText(_translate("MainWindow", "Step"))
         self.btn_step_round.setText(_translate("MainWindow", "Finish Game"))
-        self.label_2.setText(_translate("MainWindow", "N Games:"))
+        self.label_2.setText(_translate("MainWindow", "Step N Games"))
         self.board_box.setTitle(_translate("MainWindow", "GroupBox"))
         self.label.setText(_translate("MainWindow", "Bots"))
         self.label_winners.setText(_translate("MainWindow", "Winners"))

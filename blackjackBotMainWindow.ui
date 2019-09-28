@@ -64,7 +64,7 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>N Games:</string>
+         <string>Step N Games</string>
         </property>
        </widget>
       </item>

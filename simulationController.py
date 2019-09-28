@@ -36,6 +36,7 @@ class simulationController(QObject):
 
         self.n_games = 0
         self.step_n_games = 1
+        self.n_games_generation = 0
 
 
     def set_sim_state(self, new_state):
@@ -101,7 +102,7 @@ class simulationController(QObject):
         self.game_ui.deal_to_player()
 
         for bot in self.player_bots:
-            bot.reset()
+            bot.new_game_reset()
 
         if self.sim_state == simState.Step or self.sim_state == simState.Paused:
             self.set_sim_state(simState.Paused)
@@ -149,8 +150,10 @@ class simulationController(QObject):
 
 
     def state_game_end(self):
+        self.n_games += 1
+        self.n_games_generation += 1
 
-        # w/t/l
+        # win/tie/loss
         for bot in self.player_bots:
 
             if bot.card_total > 21:
@@ -164,23 +167,29 @@ class simulationController(QObject):
             elif bot.card_total > self.game_ui.dealer_total():
                 bot.win_game()
 
-        # delete broke bots
-        for bot in reversed(self.player_bots):
-            if bot.money <= 0:
-                self.player_bots.remove(bot)
 
         # sort bots by fitness
         self.player_bots.sort(key=lambda x: x.fitness, reverse=True)
 
-        # refill bots
-        while len(self.player_bots) < self.n_bots:
-            # get fittest bot with deviation
-            dev = int(abs(numpy.random.normal(0,5)))
-            self.player_bots.append(self.generate_bot(self.player_bots[dev]))
+        # if it's time for a new generation
+        if self.n_games_generation > 250 and self.player_bots[0].fitness != self.player_bots[50].fitness:
+            self.n_games_generation = 0
 
-        self.n_games += 1
+            # how many replacements?
+            pops = int(len(self.player_bots)/2)
+            # remove the worst
+            for i in range(pops):
+                self.player_bots.pop()
+
+            # replace
+            for i in range(pops):
+                self.player_bots[i].reset()
+                self.player_bots.append(self.generate_bot(self.player_bots[i]))
+
+
         self.game_ui.update_n_games(self.n_games)
         self.game_ui.update_data_display()
+
 
         # if we're stepping n games, tick down and process
         if self.sim_state == simState.StepGames:

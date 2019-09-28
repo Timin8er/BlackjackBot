@@ -9,7 +9,6 @@ import pyqtgraph
 import numpy
 
 from simulationController import simulationController
-
 from blackjackBotMainWindow import Ui_MainWindow
 
 
@@ -245,7 +244,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         fit = []
         most = -1000000000
         for bot in self.simulation_controller.player_bots:
-            fit.append(bot.money)
+            fit.append(bot.fitness)
             if bot.fitness > most:
                 most = bot.fitness
 
