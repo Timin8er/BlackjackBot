@@ -242,20 +242,18 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
     def update_data_display(self):
         fit = []
-        most = -1000000000
         for bot in self.simulation_controller.player_bots:
             fit.append(bot.fitness)
-            if bot.fitness > most:
-                most = bot.fitness
-
-        self.fitness_history.append(most)
-        self.fitness_history_recent.append(most)
-        if len(self.fitness_history_recent) > 100:
-            self.fitness_history_recent.pop(0)
 
         self.current_fitness_plot.clear()
         self.current_fitness_plot.plot(fit, symbol='o', pen=None)
 
+
+    def update_generation_display(self, most_fit_bot):
+        self.fitness_history.append(most_fit_bot.fitness)
+        self.fitness_history_recent.append(most_fit_bot.fitness)
+        # if len(self.fitness_history_recent) > 100:
+        #     self.fitness_history_recent.pop(0)
         self.fitness_history_plot.clear()
         self.fitness_history_plot.plot(self.fitness_history_recent)
 

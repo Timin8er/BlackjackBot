@@ -37,6 +37,7 @@ class simulationController(QObject):
         self.n_games = 0
         self.step_n_games = 1
         self.n_games_generation = 0
+        self.games_per_generation = 200
 
 
     def set_sim_state(self, new_state):
@@ -172,8 +173,9 @@ class simulationController(QObject):
         self.player_bots.sort(key=lambda x: x.fitness, reverse=True)
 
         # if it's time for a new generation
-        if self.n_games_generation > 250 and self.player_bots[0].fitness != self.player_bots[50].fitness:
+        if self.n_games_generation > self.games_per_generation and self.player_bots[0].fitness != self.player_bots[50].fitness:
             self.n_games_generation = 0
+            self.game_ui.update_generation_display(self.player_bots[0])
 
             # how many replacements?
             pops = int(len(self.player_bots)/2)
@@ -185,6 +187,7 @@ class simulationController(QObject):
             for i in range(pops):
                 self.player_bots[i].reset()
                 self.player_bots.append(self.generate_bot(self.player_bots[i]))
+
 
 
         self.game_ui.update_n_games(self.n_games)
