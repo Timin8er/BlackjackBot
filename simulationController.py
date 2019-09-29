@@ -181,12 +181,21 @@ class simulationController(QObject):
             pops = int(len(self.player_bots)/2)
             # remove the worst
             for i in range(pops):
-                self.player_bots.pop()
+                # print ('pooping: %s' % self.player_bots.pop().fitness)
 
             # replace
+            i = 0
+            while len(self.player_bots) < self.n_bots:
+                # print ('breeding: %s' % self.player_bots[i].fitness)
+                self.player_bots.append(self.generate_bot(self.player_bots[i]))
+                # all bots tied for first, get a second offspring
+                if self.player_bots[i].fitness == self.player_bots[0].fitness and len(self.player_bots) < self.n_bots:
+                    self.player_bots.append(self.generate_bot(self.player_bots[i]))
+                i += 1
+
+            # reset all bots
             for i in range(pops):
                 self.player_bots[i].reset()
-                self.player_bots.append(self.generate_bot(self.player_bots[i]))
 
 
 

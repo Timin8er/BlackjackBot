@@ -78,7 +78,7 @@ class playerBot(QObject):
 
 
     def recalc_fitness(self):
-        self.fitness = self.games_won
+        self.fitness = self.money
         # self.fitness = self.games_won / self.games_played
 
     def sigma(self, x):
