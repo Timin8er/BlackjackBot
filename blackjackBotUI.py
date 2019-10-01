@@ -9,7 +9,6 @@ import pyqtgraph
 import numpy
 
 from simulationController import simulationController
-
 from blackjackBotMainWindow import Ui_MainWindow
 
 
@@ -79,6 +78,8 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         self.simulation_controller = simulationController(self)
         self.total_bots = self.simulation_controller.player_bots
+        self.progressBar_bots.setMaximum(len(self.total_bots))
+        self.progressBar_generation.setMaximum(self.simulation_controller.games_per_generation)
 
         # controll button icons
         self.btn_pause.setIcon(QIcon('icons/pause.png'))
@@ -156,7 +157,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
     # ==========================================================================
     # actions for controlling the playspace
     def clear_board(self):
-        self.progressBar.setProperty("value", 0)
+        self.progressBar_bots.setProperty("value", 0)
 
         for i in self._dealer_cards:
             i['object'].deleteLater()
@@ -238,25 +239,25 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
     # ==========================================================================
     # stats and progress
     def update_progress(self, n):
-        self.progressBar.setProperty("value", n)
+        self.progressBar_bots.setProperty("value", n)
 
 
     def update_data_display(self):
         fit = []
-        most = -1000000000
         for bot in self.simulation_controller.player_bots:
-            fit.append(bot.money)
-            if bot.fitness > most:
-                most = bot.fitness
-
-        self.fitness_history.append(most)
-        self.fitness_history_recent.append(most)
-        if len(self.fitness_history_recent) > 100:
-            self.fitness_history_recent.pop(0)
+            fit.append(bot.fitness)
 
         self.current_fitness_plot.clear()
         self.current_fitness_plot.plot(fit, symbol='o', pen=None)
 
+        self.progressBar_generation.setProperty("value", (self.simulation_controller.n_games_generation))
+
+
+    def update_generation_display(self, most_fit_bot):
+        self.fitness_history.append(most_fit_bot.fitness)
+        self.fitness_history_recent.append(most_fit_bot.fitness)
+        # if len(self.fitness_history_recent) > 100:
+        #     self.fitness_history_recent.pop(0)
         self.fitness_history_plot.clear()
         self.fitness_history_plot.plot(self.fitness_history_recent)
 

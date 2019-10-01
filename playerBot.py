@@ -14,11 +14,6 @@ class playerBot(QObject):
 
         self.board_controller = board_controller
 
-        self.money = 100
-        self.fitness = 0
-        self.games_won = 0
-        self.games_lost = 0
-        self.games_played = 0
         self.card_total = 0
         self.nural_net = None
 
@@ -30,7 +25,19 @@ class playerBot(QObject):
 
     def reset(self):
         self.card_total = 0
+        self.money = 100
+        self.games_won = 0
+        self.games_lost = 0
+        self.games_played = 0
+        self.fitness = 0
+        self.new_game_reset()
+
+
+    def new_game_reset(self):
+        self.card_total = 0
         self.game_state = playerState.In
+
+
 
 
     def hit_or_hold(self):
@@ -71,7 +78,7 @@ class playerBot(QObject):
 
 
     def recalc_fitness(self):
-        self.fitness = self.games_won
+        self.fitness = self.money
         # self.fitness = self.games_won / self.games_played
 
     def sigma(self, x):
