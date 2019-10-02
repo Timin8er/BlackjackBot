@@ -182,6 +182,7 @@ class simulationController(QObject):
             # remove the worst
             for i in range(pops):
                 # print ('pooping: %s' % self.player_bots.pop().fitness)
+                self.player_bots.pop().fitness
 
             # replace
             i = 0
