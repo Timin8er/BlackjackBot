@@ -27,6 +27,8 @@ class playerBot(QObject):
         if parent_bot:
             self.nural_net = nuralNetLayer(parent = parent_bot.nural_net)
 
+        self.original = False
+
 
     def reset(self):
         self.card_total = 0

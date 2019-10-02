@@ -28,6 +28,8 @@ class simulationController(QObject):
         self.player_bots = []
         for i in range(self.n_bots):
             self.player_bots.append(playerBot(self.game_ui, self.grandfather_bot))
+        for i in self.player_bots:
+            i.original = True
 
         self.dealer_bot = dealerBot(self, game_ui)
 
@@ -195,8 +197,11 @@ class simulationController(QObject):
                 # print ('breeding: %s' % self.player_bots[i].fitness)
                 self.player_bots.append(self.generate_bot(self.player_bots[i]))
                 # all bots tied for first, get a second offspring
-                if self.player_bots[i].fitness == self.player_bots[0].fitness and len(self.player_bots) < self.n_bots:
-                    self.player_bots.append(self.generate_bot(self.player_bots[i]))
+                if self.player_bots[i].fitness == self.player_bots[0].fitness:
+                    for i in range(3):
+                        if len(self.player_bots) >= self.n_bots:
+                            break
+                        self.player_bots.append(self.generate_bot(self.player_bots[i]))
                 i += 1
 
             # reset all bots

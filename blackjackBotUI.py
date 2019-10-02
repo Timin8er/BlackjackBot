@@ -274,6 +274,12 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.fitness_history_plot.clear()
         self.fitness_history_plot.plot(self.fitness_history_recent)
 
+        n = 0
+        for bot in self.simulation_controller.player_bots:
+            if bot.original:
+                n+=1
+        self.printNOriginals.setText(str(n))
+
 
     def update_n_games(self, n : int):
         self.lcd_n_games.setProperty("intValue", n)
