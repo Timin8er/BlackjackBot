@@ -17,6 +17,10 @@ class playerBot(QObject):
         self.card_total = 0
         self.nural_net = None
 
+        self.bet = 1
+        self.win_history = 0
+        self.memory = [0,0,0,0,0,0,0,0,0,0]
+
         self.reset()
 
         if parent_bot:
@@ -38,27 +42,30 @@ class playerBot(QObject):
         self.game_state = playerState.In
 
 
-
-
-    def hit_or_hold(self):
-        self.card_total = self.board_controller.player_total()
-
-        r = self.nural_net.feedforward([
-            self.card_total,
-            self.board_controller.dealer_total()
-        ])
+    def hit_or_hold(self, inputs):
+        r = self.feed_forward(inputs)
 
         if r[0] > 0.5:
             self.game_state = playerState.In
         else:
             self.game_state = playerState.Out
+            self.card_total = self.board_controller.player_total()
         return self.game_state
+
+
+    def feed_forward(self, inputs):
+        return self.nural_net.feed_forward(inputs)
 
 
     def win_game(self):
         self.games_played += 1
         self.games_won += 1
         self.money += 1
+
+        if self.win_history:
+            self.win_history += 1
+        else:
+            self.win_history = 1
 
         self.recalc_fitness()
 
@@ -67,6 +74,11 @@ class playerBot(QObject):
         self.games_played += 1
         self.games_lost += 1
         self.money -= 1
+
+        if self.win_history:
+            self.win_history = -1
+        else:
+            self.win_history -= 1
 
         self.recalc_fitness()
 

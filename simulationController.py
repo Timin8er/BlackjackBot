@@ -22,7 +22,7 @@ class simulationController(QObject):
 
         # generate grandfather bot
         self.grandfather_bot = grandfatherPlayerBot(self.game_ui)
-        # print (self.grandfather_bot.nural_net.feedforward([16,99]))
+        # print (self.grandfather_bot.nural_net.feed_forward([16,99]))
 
         self.player_bots = []
         for i in range(self.n_bots):
@@ -30,7 +30,7 @@ class simulationController(QObject):
 
         self.dealer_bot = dealerBot(self, game_ui)
 
-        self.player_hit_hold_processor = playerHitHoldProcessor(self.player_bots)
+        self.player_hit_hold_processor = playerHitHoldProcessor(self, self.player_bots)
         self.player_hit_hold_processor.finished.connect(self.state_player_turn_end)
         self.player_hit_hold_processor.progress_update.connect(self.game_ui.update_progress)
 
@@ -182,6 +182,7 @@ class simulationController(QObject):
             # remove the worst
             for i in range(pops):
                 # print ('pooping: %s' % self.player_bots.pop().fitness)
+                self.player_bots.pop().fitness
 
             # replace
             i = 0
