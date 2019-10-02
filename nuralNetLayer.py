@@ -56,5 +56,5 @@ class nuralNetLayer(object):
             return input
         else:
             input *= numpy.random.normal(1, 0.1)
-            input += numpy.random.normal(0, 0.05)
+            input += numpy.random.normal(0, 0.1)
             return input

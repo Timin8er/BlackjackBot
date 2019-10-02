@@ -121,8 +121,6 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
 
 
-
-
     # ==========================================================================
     # actions for controlling the simulation
 
@@ -237,6 +235,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         for i in cards:
             tot += i['value']
         return tot
+
 
 
     # ==========================================================================

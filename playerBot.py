@@ -17,6 +17,10 @@ class playerBot(QObject):
         self.card_total = 0
         self.nural_net = None
 
+        self.bet = 1
+        self.win_history = 0
+        self.memory = [0,0,0,0,0,0,0,0,0,0]
+
         self.reset()
 
         if parent_bot:
@@ -36,8 +40,6 @@ class playerBot(QObject):
     def new_game_reset(self):
         self.card_total = 0
         self.game_state = playerState.In
-
-
 
 
     def hit_or_hold(self, inputs):
@@ -60,6 +62,11 @@ class playerBot(QObject):
         self.games_won += 1
         self.money += 1
 
+        if self.win_history:
+            self.win_history += 1
+        else:
+            self.win_history = 1
+
         self.recalc_fitness()
 
 
@@ -67,6 +74,11 @@ class playerBot(QObject):
         self.games_played += 1
         self.games_lost += 1
         self.money -= 1
+
+        if self.win_history:
+            self.win_history = -1
+        else:
+            self.win_history -= 1
 
         self.recalc_fitness()
 
