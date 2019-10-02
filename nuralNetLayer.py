@@ -25,7 +25,7 @@ class nuralNetLayer(object):
         # print ('weights: %s' % self.weights)
         # print ('biases: %s' % self.biases)
 
-    def feedforward(self, inputs):
+    def feed_forward(self, inputs):
         # calculate self
         outputs = numpy.add(numpy.dot(inputs, self.weights), self.biases)
 
@@ -33,7 +33,7 @@ class nuralNetLayer(object):
 
         # propagate forward
         if self.next_layer:
-            return self.next_layer.feedforward(outputs)
+            return self.next_layer.feed_forward(outputs)
         return outputs
 
 
@@ -42,6 +42,7 @@ class nuralNetLayer(object):
             self.next_layer.add_layer(parent)
         else:
             self.next_layer = nuralNetLayer(previouse_layer=self, parent=parent)
+        return self.next_layer
 
 
     def sigma(self, x):

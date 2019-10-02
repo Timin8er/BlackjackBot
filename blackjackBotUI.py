@@ -105,6 +105,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         self._dealer_cards = []
         self._player_cards = []
+        self._player_cards_input = [0,0,0,0,0,0,0,0,0,0]
 
         self._dealer_total = 0
         self._player_total = 0
@@ -166,6 +167,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         self._dealer_cards = []
         self._player_cards = []
+        self._player_cards_input = [0,0,0,0,0,0,0,0,0,0]
         self._dealer_total = 0
         self._player_total = 0
 
@@ -216,6 +218,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         new_card = self.get_random_unplayed_card()
         new_card['in_play'] = True
         self._player_cards.append(new_card)
+        self._player_cards_input[new_card['value'] - 2] += 1
 
         self.hlayout_players_hand.insertWidget(self.hlayout_players_hand.count()-1, self.generate_card_widget(new_card))
 
