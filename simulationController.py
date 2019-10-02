@@ -5,7 +5,8 @@ from util.enums import simState, playerState
 from dealerBot import dealerBot
 from playerBot import playerBot
 from grandfatherPlayerBot import grandfatherPlayerBot
-from playerHitHoldProcessor import playerHitHoldProcessor
+from playerProcessors.hitHoldProcessor import hitHoldProcessor
+from playerProcessors.betProcessor import betProcessor
 
 import time
 import numpy
@@ -30,9 +31,11 @@ class simulationController(QObject):
 
         self.dealer_bot = dealerBot(self, game_ui)
 
-        self.player_hit_hold_processor = playerHitHoldProcessor(self, self.player_bots)
+        self.player_hit_hold_processor = hitHoldProcessor(self, self.player_bots)
         self.player_hit_hold_processor.finished.connect(self.state_player_turn_end)
         self.player_hit_hold_processor.progress_update.connect(self.game_ui.update_progress)
+
+        self.player_bet_processor = betProcessor(self, self.player_bots)
 
         self.n_games = 0
         self.step_n_games = 1
@@ -97,6 +100,8 @@ class simulationController(QObject):
         """
         Reset everything to the beginning of a game
         """
+        self.player_bet_processor.start()
+
         # print ('new game')
         self.game_ui.clear_board()
         self.game_ui.deal_to_dealer()

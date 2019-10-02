@@ -6,6 +6,7 @@ from nuralNetLayer import nuralNetLayer
 
 import random
 import numpy
+import math
 
 class playerBot(QObject):
 
@@ -42,6 +43,10 @@ class playerBot(QObject):
         self.game_state = playerState.In
 
 
+    def feed_forward(self, inputs):
+        return self.nural_net.feed_forward(inputs)
+
+
     def hit_or_hold(self, inputs):
         r = self.feed_forward(inputs)
 
@@ -53,14 +58,18 @@ class playerBot(QObject):
         return self.game_state
 
 
-    def feed_forward(self, inputs):
-        return self.nural_net.feed_forward(inputs)
+    def place_bet(self, inputs):
+        r = self.feed_forward(inputs)
+
+        b = r[1]
+        self.bet = max(math.log((1/b)-1), 1)
+        return self.bet
 
 
     def win_game(self):
         self.games_played += 1
         self.games_won += 1
-        self.money += 1
+        self.money += self.bet
 
         if self.win_history:
             self.win_history += 1
@@ -73,7 +82,7 @@ class playerBot(QObject):
     def lose_game(self):
         self.games_played += 1
         self.games_lost += 1
-        self.money -= 1
+        self.money -= self.bet
 
         if self.win_history:
             self.win_history = -1

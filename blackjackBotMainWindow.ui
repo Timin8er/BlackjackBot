@@ -203,12 +203,12 @@
         <item row="1" column="0">
          <widget class="QLabel" name="label_winners">
           <property name="text">
-           <string>Winners</string>
+           <string>N Bots</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLabel" name="print_winners">
+         <widget class="QLabel" name="printNBots">
           <property name="text">
            <string>TextLabel</string>
           </property>
@@ -217,12 +217,12 @@
         <item row="2" column="0">
          <widget class="QLabel" name="label_loosers">
           <property name="text">
-           <string>Loosers</string>
+           <string>N Threads</string>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QLabel" name="print_loosers">
+         <widget class="QLabel" name="printNThreads">
           <property name="text">
            <string>TextLabel</string>
           </property>
@@ -231,12 +231,12 @@
         <item row="3" column="0">
          <widget class="QLabel" name="label_busters">
           <property name="text">
-           <string>Busters</string>
+           <string>N Decks</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QLabel" name="print_busters">
+         <widget class="QLabel" name="printNDecks">
           <property name="text">
            <string>TextLabel</string>
           </property>
@@ -254,14 +254,42 @@
       <item>
        <layout class="QFormLayout" name="form_data_1">
         <item row="0" column="0">
-         <widget class="QLabel" name="label_tb">
+         <widget class="QLabel" name="labelTGen">
           <property name="text">
-           <string>t/b</string>
+           <string>Time / Gen</string>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="print_tb">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="labelTGame">
+          <property name="text">
+           <string>Time / Game</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_9">
           <property name="text">
            <string>TextLabel</string>
           </property>
@@ -279,7 +307,7 @@
       <item>
        <layout class="QFormLayout" name="form_data_2">
         <item row="0" column="0">
-         <widget class="QLabel" name="label_best_money">
+         <widget class="QLabel" name="labelBestMoney">
           <property name="text">
            <string>Best Money</string>
           </property>
@@ -337,6 +365,7 @@
      <string>Simulation</string>
     </property>
     <addaction name="actionReset"/>
+    <addaction name="actionPrintBestBot"/>
    </widget>
    <addaction name="menuSimulation"/>
   </widget>
@@ -344,6 +373,11 @@
   <action name="actionReset">
    <property name="text">
     <string>Reset</string>
+   </property>
+  </action>
+  <action name="actionPrintBestBot">
+   <property name="text">
+    <string>Print Best Bot</string>
    </property>
   </action>
  </widget>

@@ -5,7 +5,7 @@ from util.enums import playerState
 # import time
 import random
 
-class playerHitHoldProcessor(QThread):
+class hitHoldProcessor(QThread):
 
     progress_update = pyqtSignal(int)
 
@@ -38,6 +38,7 @@ class playerHitHoldProcessor(QThread):
                 if player.hit_or_hold(ins) == playerState.In:
                     self.remaing_in += 1
 
-            self.progress_update.emit(i+1)
+            if i == 0 or (i+1) % self.update_tempo == 0:
+                self.progress_update.emit(i+1)
 
             # time.sleep(0.05)
