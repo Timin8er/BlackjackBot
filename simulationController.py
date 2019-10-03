@@ -5,7 +5,8 @@ from util.enums import simState, playerState
 from dealerBot import dealerBot
 from playerBot import playerBot
 from grandfatherPlayerBot import grandfatherPlayerBot
-from playerHitHoldProcessor import playerHitHoldProcessor
+from playerProcessors.hitHoldProcessor import hitHoldProcessor
+from playerProcessors.betProcessor import betProcessor
 
 import time
 import numpy
@@ -18,7 +19,8 @@ class simulationController(QObject):
         QObject.__init__(self)
         self.game_ui = game_ui
         self.resume_at = self.state_new_game
-        self.n_bots = 100
+        self.n_bots = 400
+        self.n_threads = 10
 
         # generate grandfather bot
         self.grandfather_bot = grandfatherPlayerBot(self.game_ui)
@@ -27,12 +29,16 @@ class simulationController(QObject):
         self.player_bots = []
         for i in range(self.n_bots):
             self.player_bots.append(playerBot(self.game_ui, self.grandfather_bot))
+        for i in self.player_bots:
+            i.original = True
 
         self.dealer_bot = dealerBot(self, game_ui)
 
-        self.player_hit_hold_processor = playerHitHoldProcessor(self, self.player_bots)
+        self.player_hit_hold_processor = hitHoldProcessor(self, self.player_bots)
         self.player_hit_hold_processor.finished.connect(self.state_player_turn_end)
         self.player_hit_hold_processor.progress_update.connect(self.game_ui.update_progress)
+
+        self.player_bet_processor = betProcessor(self, self.player_bots)
 
         self.n_games = 0
         self.step_n_games = 1
@@ -97,6 +103,8 @@ class simulationController(QObject):
         """
         Reset everything to the beginning of a game
         """
+        self.player_bet_processor.start()
+
         # print ('new game')
         self.game_ui.clear_board()
         self.game_ui.deal_to_dealer()
@@ -190,8 +198,11 @@ class simulationController(QObject):
                 # print ('breeding: %s' % self.player_bots[i].fitness)
                 self.player_bots.append(self.generate_bot(self.player_bots[i]))
                 # all bots tied for first, get a second offspring
-                if self.player_bots[i].fitness == self.player_bots[0].fitness and len(self.player_bots) < self.n_bots:
-                    self.player_bots.append(self.generate_bot(self.player_bots[i]))
+                if self.player_bots[i].fitness == self.player_bots[0].fitness:
+                    for i in range(3):
+                        if len(self.player_bots) >= self.n_bots:
+                            break
+                        self.player_bots.append(self.generate_bot(self.player_bots[i]))
                 i += 1
 
             # reset all bots
