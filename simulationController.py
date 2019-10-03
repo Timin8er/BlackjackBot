@@ -19,7 +19,8 @@ class simulationController(QObject):
         QObject.__init__(self)
         self.game_ui = game_ui
         self.resume_at = self.state_new_game
-        self.n_bots = 100
+        self.n_bots = 400
+        self.n_threads = 10
 
         # generate grandfather bot
         self.grandfather_bot = grandfatherPlayerBot(self.game_ui)

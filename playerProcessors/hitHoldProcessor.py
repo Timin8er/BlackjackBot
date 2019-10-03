@@ -1,44 +1,39 @@
 #!/usr/bin/env python
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 from util.enums import playerState
+from playerProcessors.playerProcessor import playerProcessor
 
-# import time
 import random
 
-class hitHoldProcessor(QThread):
+class hitHoldProcessor(playerProcessor):
 
     progress_update = pyqtSignal(int)
 
 
     def __init__(self, sim_controller, player_bots : list):
-        QThread.__init__(self)
-        self.player_bots = player_bots
-        self.sim_controller = sim_controller
+        playerProcessor.__init__(self, sim_controller, player_bots)
 
         self.update_tempo = 10
         self.remaing_in = 100
 
 
-
     def run(self):
-        inputs = self.sim_controller.game_ui._player_cards_input.copy()
-        inputs.append(self.sim_controller.game_ui._dealer_total)
+        self.inputs = self.sim_controller.game_ui._player_cards_input.copy()
+        self.inputs.append(self.sim_controller.game_ui._dealer_total)
 
         self.remaing_in = 0
-        for i in range(len(self.player_bots)):
-            player = self.player_bots[i]
 
-            ins = inputs.copy()
-            ins.append(player.bet)
-            ins.append(player.win_history)
-            ins.extend(player.memory)
-            ins.append(random.random())
+        playerProcessor.run(self)
 
-            if player.game_state == playerState.In:
-                if player.hit_or_hold(ins) == playerState.In:
-                    self.remaing_in += 1
 
-            if i == 0 or (i+1) % self.update_tempo == 0:
-                self.progress_update.emit(i+1)
+    def operation(self, bot):
 
-            # time.sleep(0.05)
+        ins = self.inputs.copy()
+        ins.append(bot.bet)
+        ins.append(bot.win_history)
+        ins.extend(bot.memory)
+        ins.append(random.random())
+
+        if bot.game_state == playerState.In:
+            if bot.hit_or_hold(ins) == playerState.In:
+                self.remaing_in += 1
