@@ -5,8 +5,7 @@ from util.enums import simState, playerState
 from dealerBot import dealerBot
 from playerBot import playerBot
 from grandfatherPlayerBot import grandfatherPlayerBot
-from playerProcessors.hitHoldProcessor import hitHoldProcessor
-from playerProcessors.betProcessor import betProcessor
+from playerProcessors.processManager import processManager
 
 import time
 import numpy
@@ -18,32 +17,27 @@ class simulationController(QObject):
     def __init__(self, game_ui):
         QObject.__init__(self)
         self.game_ui = game_ui
-        self.resume_at = self.state_new_game
+        self.resume_at = self.run_trials
         self.n_bots = 400
-        self.n_threads = 10
-
-        # generate grandfather bot
-        self.grandfather_bot = grandfatherPlayerBot(self.game_ui)
-        # print (self.grandfather_bot.nural_net.feed_forward([16,99]))
-
-        self.player_bots = []
-        for i in range(self.n_bots):
-            self.player_bots.append(playerBot(self.game_ui, self.grandfather_bot))
-        for i in self.player_bots:
-            i.original = True
 
         self.dealer_bot = dealerBot(self, game_ui)
-
-        self.player_hit_hold_processor = hitHoldProcessor(self, self.player_bots)
-        self.player_hit_hold_processor.finished.connect(self.state_player_turn_end)
-        self.player_hit_hold_processor.progress_update.connect(self.game_ui.update_progress)
-
-        self.player_bet_processor = betProcessor(self, self.player_bots)
 
         self.n_games = 0
         self.step_n_games = 1
         self.n_games_generation = 0
         self.games_per_generation = 200
+
+        # muliprocesses
+        self.process_manager = processManager(self, self.n_bots)
+        self.process_manager.start_processes()
+
+        # generate grandfather bot
+        grandfather_bot = grandfatherPlayerBot()
+        # print (self.grandfather_bot.nural_net.feed_forward([16,99]))
+
+        self.player_bots = []
+        for i in range(self.process_manager.n_processes * 2):
+            self.player_bots.append(playerBot(grandfather_bot))
 
 
     def set_sim_state(self, new_state):
@@ -99,6 +93,20 @@ class simulationController(QObject):
     # ==========================================================================
     # Simulation state machine
 
+
+    def run_trials(self):
+        self.process_manager.begin_trials(self.player_bots)
+
+
+
+
+
+
+
+
+
+
+
     def state_new_game(self):
         """
         Reset everything to the beginning of a game
@@ -126,9 +134,6 @@ class simulationController(QObject):
         """
         # print ('player turn')
         self.game_ui.deal_to_player()
-        # print ('player turn: %s' % self.game_ui.player_total())
-
-        # print(self.game_ui.dealer_total(), self.game_ui.player_total())
         self.player_hit_hold_processor.start()
 
 
@@ -208,8 +213,6 @@ class simulationController(QObject):
             # reset all bots
             for i in range(pops):
                 self.player_bots[i].reset()
-
-
 
         self.game_ui.update_n_games(self.n_games)
         self.game_ui.update_data_display()

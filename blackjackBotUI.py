@@ -76,10 +76,10 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.show()
 
-        self.simulation_controller = simulationController(self)
-        self.total_bots = self.simulation_controller.player_bots
+        self.sim_controller = simulationController(self)
+        self.total_bots = self.sim_controller.player_bots
         self.progressBar_bots.setMaximum(len(self.total_bots))
-        self.progressBar_generation.setMaximum(self.simulation_controller.games_per_generation)
+        self.progressBar_generation.setMaximum(self.sim_controller.games_per_generation)
 
         # menu actions
         self.actionPrintBestBot.triggered.connect(self.print_best_bot)
@@ -92,13 +92,13 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         # controll button functions
         self.btn_pause.clicked.connect(self.action_pause)
-        self.btn_pause.clicked.connect(self.simulation_controller.action_pause)
+        self.btn_pause.clicked.connect(self.sim_controller.action_pause)
         self.btn_play.clicked.connect(self.action_play)
-        self.btn_play.clicked.connect(self.simulation_controller.action_play)
+        self.btn_play.clicked.connect(self.sim_controller.action_play)
         self.btn_step_round.clicked.connect(self.action_step_game)
-        self.btn_step_round.clicked.connect(self.simulation_controller.action_step_game)
+        self.btn_step_round.clicked.connect(self.sim_controller.action_step_game)
         self.btn_step.clicked.connect(self.action_step)
-        self.btn_step.clicked.connect(self.simulation_controller.action_step)
+        self.btn_step.clicked.connect(self.sim_controller.action_step)
 
         self.btn_pause.setEnabled(False)
 
@@ -178,10 +178,10 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
     def print_best_bot(self):
         with open('best_bot', 'w') as f:
-            f.write(str(self.simulation_controller.player_bots[0].nural_net.weights))
-            f.write(str(self.simulation_controller.player_bots[0].nural_net.biases))
-            f.write(str(self.simulation_controller.player_bots[0].nural_net.next_layer.weights))
-            f.write(str(self.simulation_controller.player_bots[0].nural_net.next_layer.biases))
+            f.write(str(self.sim_controller.player_bots[0].nural_net.weights))
+            f.write(str(self.sim_controller.player_bots[0].nural_net.biases))
+            f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.weights))
+            f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.biases))
 
 
     def get_random_card(self):
@@ -257,13 +257,13 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
     def update_data_display(self):
         fit = []
-        for bot in self.simulation_controller.player_bots:
+        for bot in self.sim_controller.player_bots:
             fit.append(bot.fitness)
 
         self.current_fitness_plot.clear()
         self.current_fitness_plot.plot(fit, symbol='o', pen=None)
 
-        self.progressBar_generation.setProperty("value", (self.simulation_controller.n_games_generation))
+        self.progressBar_generation.setProperty("value", (self.sim_controller.n_games_generation))
 
 
     def update_generation_display(self, most_fit_bot):
@@ -275,7 +275,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.fitness_history_plot.plot(self.fitness_history_recent)
 
         n = 0
-        for bot in self.simulation_controller.player_bots:
+        for bot in self.sim_controller.player_bots:
             if bot.original:
                 n+=1
         self.printNOriginals.setText(str(n))
@@ -289,6 +289,9 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         return self.spinbox_n_games.value()
 
 
+    def closeEvent(self, event):
+        self.sim_controller.process_manager.end_processes()
+        event.accept()
 
 
 
