@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 import random
-from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow
+from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow, QStyleFactory
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import pyqtSignal, QRect
 
@@ -78,8 +78,8 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         self.sim_controller = simulationController(self)
         self.total_bots = self.sim_controller.player_bots
-        self.progressBar_bots.setMaximum(len(self.total_bots))
-        self.progressBar_generation.setMaximum(self.sim_controller.games_per_generation)
+        self.progressBar_simulated.setMaximum(self.sim_controller.games_per_generation)
+        self.progressBar_generated.setMaximum(self.sim_controller.games_per_generation)
 
         # menu actions
         self.actionPrintBestBot.triggered.connect(self.print_best_bot)
@@ -101,6 +101,11 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.btn_step.clicked.connect(self.sim_controller.action_step)
 
         self.btn_pause.setEnabled(False)
+
+        QApplication.setStyle(QStyleFactory.create('Fusion'))
+
+        with open('style.css') as s:
+            self.setStyleSheet(s.read())
 
         self._cards_sheet = QPixmap('icons/cards.png')
         self._cards_w = self._cards_sheet.width() / 13

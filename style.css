@@ -1,0 +1,44 @@
+QWidget{
+  color: white;
+  background-color: black;
+  border-color: grey;
+}
+
+QGroupBox{
+  margin-top: 8px;
+  border: 1px solid cyan;
+}
+QGroupBox:title{
+  top: -10px;
+  right: -10px;
+}
+
+
+QProgressBar{
+  border: 1px solid grey;
+}
+
+QToolButton{
+  border: 1px solid grey;
+  background-color: grey;
+}
+QToolButton:disabled{
+  background-color: black;
+}
+
+
+QAbstractSpinBox,
+QLCDNumber{
+  border: 1px solid grey;
+}
+
+
+QProgressBar{
+  text-align: center;
+  border-radius: 5px;
+}
+QProgressBar::chunk{
+  background-color: cyan;
+  width: 10px;
+  margin: 1px;
+}
