@@ -14,9 +14,10 @@ class simulationController(QObject):
 
     sim_state = simState.Paused
 
-    def __init__(self, game_ui):
+    def __init__(self, game_ui, deck_controller):
         QObject.__init__(self)
         self.game_ui = game_ui
+        self.deck_controller = deck_controller
         self.resume_at = self.run_trials
         self.n_bots = 400
 
@@ -96,6 +97,9 @@ class simulationController(QObject):
 
     def run_trials(self):
         self.process_manager.begin_trials(self.player_bots)
+
+        self.deck_controller.deal_to_player()
+        self.deck_controller.deal_to_dealer()
 
 
 

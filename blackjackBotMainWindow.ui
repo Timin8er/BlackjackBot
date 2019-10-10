@@ -157,14 +157,14 @@
     </item>
     <item>
      <layout class="QFormLayout" name="progress_form">
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Games Simulated</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QProgressBar" name="progressBar_simulated">
         <property name="maximum">
          <number>100</number>
@@ -174,18 +174,32 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>Games Generated</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="1" column="1">
        <widget class="QProgressBar" name="progressBar_generated">
         <property name="maximum">
          <number>100</number>
         </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Deck Progress</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QProgressBar" name="progressBar_deck">
         <property name="value">
          <number>0</number>
         </property>
