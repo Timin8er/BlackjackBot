@@ -119,7 +119,7 @@ class processListener(threading.Thread):
         threading.Thread.__init__(self)
         self.process_manager = process_manager
         self.outboxes = outboxes
-        self.stop = False
+
 
     def run(self):
         while True:

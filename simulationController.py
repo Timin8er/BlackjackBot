@@ -28,7 +28,6 @@ class simulationController(QObject):
         self.n_generations = 0
         self.step_n_games = 1
         self.games_per_generation = 20
-        self.n_games_generation = 0
 
         # muliprocesses
         self.process_manager = processManager(self, self.n_bots)

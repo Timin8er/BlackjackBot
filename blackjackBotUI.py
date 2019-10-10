@@ -22,6 +22,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.show()
 
         self.card_widgets = []
+        self.n_fitness_reports = 0
 
         self.deck_controller = deckController(self)
         self.sim_controller = simulationController(self, self.deck_controller)
@@ -171,16 +172,17 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.progressBar_generated.setProperty("value", n)
 
 
-    def update_sim_generation(self):
-        pass
-
-
     def update_fitness_report(self, fitnesses: list):
         assert (isinstance(fitnesses, list)), 'invalid input type on fitnesses, expecting list, got %s' % type(fitnesses)
+        self.n_fitness_reports += 1
         fitnesses.sort(reverse=True)
         # print ('fitnesses: %s' % fit)
         self.current_fitness_plot.clear()
         self.current_fitness_plot.plot(fitnesses)
+        self.progressBar_simulated.setProperty("value", self.n_fitness_reports)
+
+
+
 
 
     def update_data_display(self):
