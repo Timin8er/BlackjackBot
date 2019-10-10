@@ -13,11 +13,6 @@ QGroupBox:title{
   right: -10px;
 }
 
-
-QProgressBar{
-  border: 1px solid grey;
-}
-
 QToolButton{
   border: 1px solid grey;
   background-color: grey;
@@ -34,11 +29,12 @@ QLCDNumber{
 
 
 QProgressBar{
+  border: 1px solid grey;
   text-align: center;
   border-radius: 5px;
 }
 QProgressBar::chunk{
-  background-color: cyan;
+  background-color: grey;
   width: 10px;
   margin: 1px;
 }

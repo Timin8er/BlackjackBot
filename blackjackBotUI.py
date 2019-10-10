@@ -130,12 +130,12 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
             c.deleteLater()
         self.card_widgets = []
 
-    def render_game(self, game_number = 0):
-        # print('rendering cards')
+    def render_game(self, dealer_cards, player_cards, game_number = 0):
+        # print(self.deck_controller.dealer_cards)
         self.clear_board()
-        for c in self.deck_controller.dealer_cards:
+        for c in dealer_cards:
             self.deal_to_dealer(c)
-        for c in self.deck_controller.player_cards:
+        for c in player_cards:
             self.deal_to_player(c)
 
         self.progressBar_generated.setProperty("value", game_number)

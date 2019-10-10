@@ -21,14 +21,14 @@ class simulationController(QObject):
         self.game_ui = game_ui
         self.deck_controller = deck_controller
         self.resume_at = self.run_trials
-        self.n_bots = 400
+        self.n_bots = 1000
 
         self.dealer_bot = dealerBot(self, deck_controller)
 
         self.n_generations = 0
         self.step_n_games = 1
+        self.games_per_generation = 20
         self.n_games_generation = 0
-        self.games_per_generation = 5
 
         # muliprocesses
         self.process_manager = processManager(self, self.n_bots)
@@ -99,7 +99,7 @@ class simulationController(QObject):
 
 class trialsThread(QThread):
 
-    game_generated = pyqtSignal(int)
+    game_generated = pyqtSignal(list,list,int)
 
     def __init__(self, sim_controller):
         QThread.__init__(self)
@@ -120,8 +120,12 @@ class trialsThread(QThread):
         for i in range(self.s_c.games_per_generation):
             self.generate_game()
             # print('waiting')
-            time.sleep(1)
-            self.game_generated.emit(i+1)
+            self.game_generated.emit(
+                self.s_c.deck_controller.dealer_cards,
+                self.s_c.deck_controller.player_cards,
+                i+1)
+            time.sleep(0.1)
+            # print(self.s_c.deck_controller.dealer_cards)
 
         self.s_c.process_manager.end_trials()
 

@@ -59,7 +59,7 @@ class deckController:
 
     def __init__(self, game_ui):
         self.game_ui = game_ui
-        self.n_decks = 1
+        self.n_decks = 5
         self.deck_progress = 0
         self.total_cards = self.n_decks*52
 
@@ -92,6 +92,15 @@ class deckController:
 
         for i in range(11):
             self._bot_inputs[i] = 0
+
+        if self.deck_progress > self.total_cards - 18:
+            self.shuffle_deck()
+
+
+    def shuffle_deck(self):
+        for c in self._deck:
+            c['in_play'] = 0
+        self.deck_progress = 0
 
 
     def inputs(self):
