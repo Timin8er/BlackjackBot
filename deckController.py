@@ -3,64 +3,65 @@ import random
 class deckController:
 
     _deck = [
-        {'ui_object':None, 'rank':0,  'suit':0, 'value':11, 'in_play':0},
-        {'ui_object':None, 'rank':1,  'suit':0, 'value':2,  'in_play':0},
-        {'ui_object':None, 'rank':2,  'suit':0, 'value':3,  'in_play':0},
-        {'ui_object':None, 'rank':3,  'suit':0, 'value':4,  'in_play':0},
-        {'ui_object':None, 'rank':4,  'suit':0, 'value':5,  'in_play':0},
-        {'ui_object':None, 'rank':5,  'suit':0, 'value':6,  'in_play':0},
-        {'ui_object':None, 'rank':6,  'suit':0, 'value':7,  'in_play':0},
-        {'ui_object':None, 'rank':7,  'suit':0, 'value':8,  'in_play':0},
-        {'ui_object':None, 'rank':8,  'suit':0, 'value':9,  'in_play':0},
-        {'ui_object':None, 'rank':9,  'suit':0, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':10, 'suit':0, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':11, 'suit':0, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':12, 'suit':0, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':0,  'suit':1, 'value':11, 'in_play':0},
-        {'ui_object':None, 'rank':1,  'suit':1, 'value':2,  'in_play':0},
-        {'ui_object':None, 'rank':2,  'suit':1, 'value':3,  'in_play':0},
-        {'ui_object':None, 'rank':3,  'suit':1, 'value':4,  'in_play':0},
-        {'ui_object':None, 'rank':4,  'suit':1, 'value':5,  'in_play':0},
-        {'ui_object':None, 'rank':5,  'suit':1, 'value':6,  'in_play':0},
-        {'ui_object':None, 'rank':6,  'suit':1, 'value':7,  'in_play':0},
-        {'ui_object':None, 'rank':7,  'suit':1, 'value':8,  'in_play':0},
-        {'ui_object':None, 'rank':8,  'suit':1, 'value':9,  'in_play':0},
-        {'ui_object':None, 'rank':9,  'suit':1, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':10, 'suit':1, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':11, 'suit':1, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':12, 'suit':1, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':0,  'suit':2, 'value':11, 'in_play':0},
-        {'ui_object':None, 'rank':1,  'suit':2, 'value':2,  'in_play':0},
-        {'ui_object':None, 'rank':2,  'suit':2, 'value':3,  'in_play':0},
-        {'ui_object':None, 'rank':3,  'suit':2, 'value':4,  'in_play':0},
-        {'ui_object':None, 'rank':4,  'suit':2, 'value':5,  'in_play':0},
-        {'ui_object':None, 'rank':5,  'suit':2, 'value':6,  'in_play':0},
-        {'ui_object':None, 'rank':6,  'suit':2, 'value':7,  'in_play':0},
-        {'ui_object':None, 'rank':7,  'suit':2, 'value':8,  'in_play':0},
-        {'ui_object':None, 'rank':8,  'suit':2, 'value':9,  'in_play':0},
-        {'ui_object':None, 'rank':9,  'suit':2, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':10, 'suit':2, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':11, 'suit':2, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':12, 'suit':2, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':0,  'suit':3, 'value':11, 'in_play':0},
-        {'ui_object':None, 'rank':1,  'suit':3, 'value':2,  'in_play':0},
-        {'ui_object':None, 'rank':2,  'suit':3, 'value':3,  'in_play':0},
-        {'ui_object':None, 'rank':3,  'suit':3, 'value':4,  'in_play':0},
-        {'ui_object':None, 'rank':4,  'suit':3, 'value':5,  'in_play':0},
-        {'ui_object':None, 'rank':5,  'suit':3, 'value':6,  'in_play':0},
-        {'ui_object':None, 'rank':6,  'suit':3, 'value':7,  'in_play':0},
-        {'ui_object':None, 'rank':7,  'suit':3, 'value':8,  'in_play':0},
-        {'ui_object':None, 'rank':8,  'suit':3, 'value':9,  'in_play':0},
-        {'ui_object':None, 'rank':9,  'suit':3, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':10, 'suit':3, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':11, 'suit':3, 'value':10, 'in_play':0},
-        {'ui_object':None, 'rank':12, 'suit':3, 'value':10, 'in_play':0}
+        {'rank':0,  'suit':0, 'value':11, 'in_play':0},
+        {'rank':1,  'suit':0, 'value':2,  'in_play':0},
+        {'rank':2,  'suit':0, 'value':3,  'in_play':0},
+        {'rank':3,  'suit':0, 'value':4,  'in_play':0},
+        {'rank':4,  'suit':0, 'value':5,  'in_play':0},
+        {'rank':5,  'suit':0, 'value':6,  'in_play':0},
+        {'rank':6,  'suit':0, 'value':7,  'in_play':0},
+        {'rank':7,  'suit':0, 'value':8,  'in_play':0},
+        {'rank':8,  'suit':0, 'value':9,  'in_play':0},
+        {'rank':9,  'suit':0, 'value':10, 'in_play':0},
+        {'rank':10, 'suit':0, 'value':10, 'in_play':0},
+        {'rank':11, 'suit':0, 'value':10, 'in_play':0},
+        {'rank':12, 'suit':0, 'value':10, 'in_play':0},
+        {'rank':0,  'suit':1, 'value':11, 'in_play':0},
+        {'rank':1,  'suit':1, 'value':2,  'in_play':0},
+        {'rank':2,  'suit':1, 'value':3,  'in_play':0},
+        {'rank':3,  'suit':1, 'value':4,  'in_play':0},
+        {'rank':4,  'suit':1, 'value':5,  'in_play':0},
+        {'rank':5,  'suit':1, 'value':6,  'in_play':0},
+        {'rank':6,  'suit':1, 'value':7,  'in_play':0},
+        {'rank':7,  'suit':1, 'value':8,  'in_play':0},
+        {'rank':8,  'suit':1, 'value':9,  'in_play':0},
+        {'rank':9,  'suit':1, 'value':10, 'in_play':0},
+        {'rank':10, 'suit':1, 'value':10, 'in_play':0},
+        {'rank':11, 'suit':1, 'value':10, 'in_play':0},
+        {'rank':12, 'suit':1, 'value':10, 'in_play':0},
+        {'rank':0,  'suit':2, 'value':11, 'in_play':0},
+        {'rank':1,  'suit':2, 'value':2,  'in_play':0},
+        {'rank':2,  'suit':2, 'value':3,  'in_play':0},
+        {'rank':3,  'suit':2, 'value':4,  'in_play':0},
+        {'rank':4,  'suit':2, 'value':5,  'in_play':0},
+        {'rank':5,  'suit':2, 'value':6,  'in_play':0},
+        {'rank':6,  'suit':2, 'value':7,  'in_play':0},
+        {'rank':7,  'suit':2, 'value':8,  'in_play':0},
+        {'rank':8,  'suit':2, 'value':9,  'in_play':0},
+        {'rank':9,  'suit':2, 'value':10, 'in_play':0},
+        {'rank':10, 'suit':2, 'value':10, 'in_play':0},
+        {'rank':11, 'suit':2, 'value':10, 'in_play':0},
+        {'rank':12, 'suit':2, 'value':10, 'in_play':0},
+        {'rank':0,  'suit':3, 'value':11, 'in_play':0},
+        {'rank':1,  'suit':3, 'value':2,  'in_play':0},
+        {'rank':2,  'suit':3, 'value':3,  'in_play':0},
+        {'rank':3,  'suit':3, 'value':4,  'in_play':0},
+        {'rank':4,  'suit':3, 'value':5,  'in_play':0},
+        {'rank':5,  'suit':3, 'value':6,  'in_play':0},
+        {'rank':6,  'suit':3, 'value':7,  'in_play':0},
+        {'rank':7,  'suit':3, 'value':8,  'in_play':0},
+        {'rank':8,  'suit':3, 'value':9,  'in_play':0},
+        {'rank':9,  'suit':3, 'value':10, 'in_play':0},
+        {'rank':10, 'suit':3, 'value':10, 'in_play':0},
+        {'rank':11, 'suit':3, 'value':10, 'in_play':0},
+        {'rank':12, 'suit':3, 'value':10, 'in_play':0}
     ]
 
     def __init__(self, game_ui):
         self.game_ui = game_ui
         self.n_decks = 1
         self.deck_progress = 0
+        self.total_cards = self.n_decks*52
 
         self.dealer_cards = []
         self.player_cards = []
@@ -129,7 +130,7 @@ class deckController:
         self.dealer_cards.append(new_card)
         self.dealer_total = self.card_total(self.dealer_cards)
         self._bot_inputs[10] = self.dealer_total
-        self.game_ui.deal_to_dealer(new_card)
+        # self.game_ui.deal_to_dealer(new_card)
         return new_card
 
 
@@ -138,5 +139,5 @@ class deckController:
         self.player_cards.append(new_card)
         self.player_total = self.card_total(self.player_cards)
         self._bot_inputs[new_card['value'] - 2] += 1
-        self.game_ui.deal_to_player(new_card)
+        # self.game_ui.deal_to_player(new_card)
         return new_card

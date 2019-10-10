@@ -14,7 +14,7 @@ class processManager(QObject):
     def __init__(self, sim_controller, start_n_bot):
         QObject.__init__(self)
         self.sim_controller = sim_controller
-        self.n_processes = multiprocessing.cpu_count()
+        self.n_processes = multiprocessing.cpu_count() - 4
         self.bots_per = int(start_n_bot / self.n_processes)
         self.sim_controller.n_bots = self.bots_per * self.n_processes
 
@@ -35,6 +35,13 @@ class processManager(QObject):
             self.outbox_queues.append(
                 multiprocessing.Queue()
             )
+
+        self.process_listener = processListener(self, self.outbox_queues)
+        self.process_listener.start()
+
+    def __del__(self):
+        self.outbox_queues[0].put('end')
+        self.end_processes()
 
 
     def start_processes(self):
@@ -82,6 +89,58 @@ class processManager(QObject):
             i.put(['start_game'])
 
 
-    def initial_hithold(self, inputs):
+    def hithold_ins(self, inputs):
         for i in self.inbox_queues:
-            i.put(['initial_hithold', inputs])
+            i.put(['hithold_ins', inputs])
+
+    def hithold(self, inputs):
+        for i in self.inbox_queues:
+            i.put(['hithold', inputs])
+
+    def insurence_payout(self, payout : bool):
+        for i in self.inbox_queues:
+            i.put(['insurence_payout', payout])
+
+    def end_game(self, dealer_total, exposed_cards):
+        for i in self.inbox_queues:
+            i.put(['end_game', dealer_total, exposed_cards])
+
+    def end_trials(self):
+        for i in self.inbox_queues:
+            i.put(['end_trials'])
+
+
+
+class processListener(threading.Thread):
+    """
+    This thread listens to the processer outboxes and activates signals when messages come through
+    """
+    def __init__(self, process_manager, outboxes):
+        threading.Thread.__init__(self)
+        self.process_manager = process_manager
+        self.outboxes = outboxes
+        self.stop = False
+
+    def run(self):
+        while True:
+            outs = []
+            for o in self.outboxes:
+                outs.append(o.get())
+                if outs[-1] == 'end':
+                    break
+
+            if outs[-1] == 'end':
+                break
+
+            if outs[0][0] == 'fitness_update':
+                fits = []
+                for i in outs:
+                    fits.extend(i[1])
+                self.process_manager.fitness_report.emit(fits)
+
+            elif outs[0][0] == 'trials_complete':
+                bots = []
+                for i in outs:
+                    fits.extend(i[1])
+
+                self.process_manager.trials_complete.emit(bots)

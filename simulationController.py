@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QThread, QTimer
 
 from util.enums import simState, playerState
 from dealerBot import dealerBot
@@ -14,6 +14,8 @@ class simulationController(QObject):
 
     sim_state = simState.Paused
 
+    render_cards = pyqtSignal()
+
     def __init__(self, game_ui, deck_controller):
         QObject.__init__(self)
         self.game_ui = game_ui
@@ -21,16 +23,21 @@ class simulationController(QObject):
         self.resume_at = self.run_trials
         self.n_bots = 400
 
-        self.dealer_bot = dealerBot(self, game_ui)
+        self.dealer_bot = dealerBot(self, deck_controller)
 
         self.n_generations = 0
         self.step_n_games = 1
         self.n_games_generation = 0
-        self.games_per_generation = 200
+        self.games_per_generation = 5
 
         # muliprocesses
         self.process_manager = processManager(self, self.n_bots)
         self.process_manager.start_processes()
+
+        self.process_manager.fitness_report.connect(self.game_ui.update_fitness_report)
+
+        self.trials_thread = trialsThread(self)
+        self.trials_thread.game_generated.connect(self.game_ui.render_game)
 
         # generate grandfather bot
         grandfather_bot = grandfatherPlayerBot()
@@ -83,166 +90,79 @@ class simulationController(QObject):
 
 
     # ==========================================================================
-    # bot stuff
-
-    def generate_bot(self, parent_bot):
-        return playerBot(self.game_ui, parent_bot)
-
-
-
-
-    # ==========================================================================
     # Simulation state machine
-
-
     def run_trials(self):
-        self.process_manager.begin_trials(self.player_bots)
+        # QTimer.singleShot(0,self.generate_trials)
+        # self.generate_trials()
+        self.trials_thread.start()
 
-        self.generate_game()
 
+class trialsThread(QThread):
+
+    game_generated = pyqtSignal(int)
+
+    def __init__(self, sim_controller):
+        QThread.__init__(self)
+
+        self.s_c = sim_controller
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        # print('hi')
+        self.generate_trials()
+
+
+    def generate_trials(self):
+        self.s_c.process_manager.begin_trials(self.s_c.player_bots)
+
+        for i in range(self.s_c.games_per_generation):
+            self.generate_game()
+            # print('waiting')
+            time.sleep(1)
+            self.game_generated.emit(i+1)
+
+        self.s_c.process_manager.end_trials()
+
+        self.s_c.set_sim_state(simState.Paused)
 
 
     def generate_game(self):
-        self.deck_controller.clear_board()
-        self.process_manager.start_game()
+        self.s_c.deck_controller.clear_board()
+        self.s_c.process_manager.start_game()
 
-        self.deck_controller.deal_to_dealer()
-        self.deck_controller.deal_to_player()
-        self.deck_controller.deal_to_player()
+        # initial hand
+        self.s_c.deck_controller.deal_to_dealer()
+        self.s_c.deck_controller.deal_to_player()
+        self.s_c.deck_controller.deal_to_player()
 
-        self.process_manager.initial_hithold(self.deck_controller.inputs()[0:11])
-
-
-
-
-
-
-
-
-
-    def state_new_game(self):
-        """
-        Reset everything to the beginning of a game
-        """
-        self.player_bet_processor.start()
-
-        # print ('new game')
-        self.game_ui.clear_board()
-        self.game_ui.deal_to_dealer()
-        self.game_ui.deal_to_player()
-
-        for bot in self.player_bots:
-            bot.new_game_reset()
-
-        if self.sim_state == simState.Step or self.sim_state == simState.Paused:
-            self.set_sim_state(simState.Paused)
-            self.resume_at = self.state_player_turn
+        # if the dealer has an ace showing on the initial hand, ask for insurence
+        if self.s_c.deck_controller.dealer_total == 11:
+            self.s_c.process_manager.hithold_ins(self.s_c.deck_controller.inputs()[0:11])
         else:
-            self.state_player_turn()
+            self.s_c.process_manager.hithold(self.s_c.deck_controller.inputs()[0:11])
 
+        # continue dealing cards to the player untill we're over 21, bots leave
+        # of their own choosing
+        while self.s_c.deck_controller.player_total < 22:
+            self.s_c.deck_controller.deal_to_player()
+            self.s_c.process_manager.hithold(self.s_c.deck_controller.inputs()[0:11])
 
-    def state_player_turn(self):
-        """
-        Iterate the players game once, determine the next step
-        """
-        # print ('player turn')
-        self.game_ui.deal_to_player()
-        self.player_hit_hold_processor.start()
-
-
-    def state_player_turn_end(self):
-        # print (self.game_ui.player_total(), self.player_hit_hold_processor.remaing_in)
-        if self.player_hit_hold_processor.remaing_in and self.game_ui.player_total() < 22:
-            if self.sim_state == simState.Step or self.sim_state == simState.Paused:
-                self.resume_at = self.state_player_turn
-                self.set_sim_state(simState.Paused)
+        # dealer reviels insurence
+        if self.s_c.deck_controller.dealer_total == 11:
+            self.s_c.deck_controller.deal_to_dealer()
+            if self.s_c.deck_controller.dealer_total == 21:
+                self.s_c.process_manager.insurence_payout(True)
             else:
-                self.state_player_turn()
-        else:
-            if self.sim_state == simState.Step or self.sim_state == simState.Paused:
-                self.resume_at = self.state_dealer_run
-                self.set_sim_state(simState.Paused)
-            else:
-                self.state_dealer_run()
+                self.s_c.process_manager.insurence_payout(False)
 
+        # dealer deals themselves cards
+        while self.s_c.dealer_bot.hithold():
+            self.s_c.deck_controller.deal_to_dealer()
 
-    def state_dealer_run(self):
-        self.dealer_bot.run()
-
-        if self.sim_state == simState.Step or self.sim_state == simState.Paused:
-            self.resume_at = self.state_game_end
-            self.set_sim_state(simState.Paused)
-        else:
-            self.state_game_end()
-
-
-    def state_game_end(self):
-        self.n_generations += 1
-        self.n_games_generation += 1
-
-        # win/tie/loss
-        for bot in self.player_bots:
-
-            if bot.card_total > 21:
-                bot.lose_game()
-            elif self.game_ui.dealer_total() > 21:
-                bot.win_game()
-            elif bot.card_total < self.game_ui.dealer_total():
-                bot.lose_game()
-            elif bot.card_total == self.game_ui.dealer_total():
-                bot.tie_game()
-            elif bot.card_total > self.game_ui.dealer_total():
-                bot.win_game()
-
-
-        # sort bots by fitness
-        self.player_bots.sort(key=lambda x: x.fitness, reverse=True)
-
-        # if it's time for a new generation
-        if self.n_games_generation >= self.games_per_generation and self.player_bots[0].fitness != self.player_bots[50].fitness:
-            self.n_games_generation = 0
-            self.game_ui.update_generation_display(self.player_bots[0])
-
-            # how many replacements?
-            pops = int(len(self.player_bots)/2)
-            # remove the worst
-            for i in range(pops):
-                # print ('pooping: %s' % self.player_bots.pop().fitness)
-                self.player_bots.pop().fitness
-
-            # replace
-            i = 0
-            while len(self.player_bots) < self.n_bots:
-                # print ('breeding: %s' % self.player_bots[i].fitness)
-                self.player_bots.append(self.generate_bot(self.player_bots[i]))
-                # all bots tied for first, get a second offspring
-                if self.player_bots[i].fitness == self.player_bots[0].fitness:
-                    for i in range(3):
-                        if len(self.player_bots) >= self.n_bots:
-                            break
-                        self.player_bots.append(self.generate_bot(self.player_bots[i]))
-                i += 1
-
-            # reset all bots
-            for i in range(pops):
-                self.player_bots[i].reset()
-
-        self.game_ui.update_n_generations(self.n_generations)
-        self.game_ui.update_data_display()
-
-
-        # if we're stepping n games, tick down and process
-        if self.sim_state == simState.StepGames:
-            self.step_n_games -= 1
-            if self.step_n_games == 0:
-                self.resume_at = self.state_new_game
-                self.set_sim_state(simState.Paused)
-            else:
-                self.state_new_game()
-        # if normal play, continue
-        elif self.sim_state == simState.Play:
-            self.state_new_game()
-        # else, we're pausing
-        else:
-            self.resume_at = self.state_new_game
-            self.set_sim_state(simState.Paused)
+        # determine winners
+        self.s_c.process_manager.end_game(
+            self.s_c.deck_controller.dealer_total,
+            self.s_c.deck_controller.inputs()[0:10]
+            )

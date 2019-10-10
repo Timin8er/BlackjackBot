@@ -5,9 +5,9 @@ from playerBot import playerBot
 from util.enums import playerState
 
 # ==============================================================================
-def player_process(n_bots, inbox_queue, outgoing_queue):
-    # print (n_bots, inbox_queue, outgoing_queue)
-    player_processor = playerProcessor(n_bots, inbox_queue, outgoing_queue)
+def player_process(n_bots, inbox_queue, outbox_queue):
+    # print (n_bots, inbox_queue, outbox_queue)
+    player_processor = playerProcessor(n_bots, inbox_queue, outbox_queue)
 
     while True:
         message = inbox_queue.get()
@@ -19,14 +19,17 @@ def player_process(n_bots, inbox_queue, outgoing_queue):
         elif message[0] == 'start_game':
             player_processor.start_game()
 
-        elif message[0] == 'initial_hithold':
+        elif message[0] == 'hithold_ins':
             player_processor.hithold(message[1], True)
 
         elif message[0] == 'hithold':
             player_processor.hithold(message[1])
 
+        elif message[0] == 'hithold':
+            player_processor.insurence_payout(message[1])
+
         elif message[0] == 'end_game':
-            player_processor.end_game(message[1])
+            player_processor.end_game(message[1], message[2])
 
         elif message[0] == 'end_trials':
             player_processor.end_trials()
@@ -42,11 +45,11 @@ def player_process(n_bots, inbox_queue, outgoing_queue):
 # ==============================================================================
 class playerProcessor(object):
 
-    def __init__(self, n_bots, inbox_queue, outgoing_queue):
+    def __init__(self, n_bots, inbox_queue, outbox_queue):
         self.player_bots = []
         self.n_bots = n_bots
         self.inbox_queue = inbox_queue
-        self.outgoing_queue = outgoing_queue
+        self.outbox_queue = outbox_queue
 
 
     def begin_trials(self, player_bots):
@@ -83,7 +86,20 @@ class playerProcessor(object):
             inp = bot.hit_or_hold(game_board_inputs, insurence_available)
             if inp == playerState.In:
                 total_in += 1
-        print(total_in)
+        # print(total_in)
+
+
+    def insurence_payout(self, payout : bool):
+        """
+        process results of the insurance bets
+        """
+        if payout:
+            for bot in self.player_bots:
+                bot.money += bot.insurence
+        else:
+            for bot in self.player_bots:
+                bot.money -= bot.insurence
+
 
 
     def end_game(self, dealer_total : int, exposed_cards : list):
@@ -96,7 +112,7 @@ class playerProcessor(object):
 
             if bot.card_total > 21:
                 bot.lose_game()
-            elif self.game_ui.dealer_total() > 21:
+            elif dealer_total > 21:
                 bot.win_game()
             elif bot.card_total < dealer_total:
                 bot.lose_game()
@@ -105,8 +121,8 @@ class playerProcessor(object):
             elif bot.card_total > dealer_total:
                 bot.win_game()
 
-            fitness_report.append(bot.fitness())
-        return fitness_report()
+            fitness_report.append(bot.fitness)
+        self.outbox_queue.put(['fitness_update', fitness_report])
 
 
 
@@ -114,4 +130,4 @@ class playerProcessor(object):
         """
         report the bots to the simulation controller for evolution
         """
-        self.outgoing_queue.put(self.player_bots)
+        self.outbox_queue.put(['trials_complete',self.player_bots])

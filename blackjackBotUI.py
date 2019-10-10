@@ -15,23 +15,23 @@ from blackjackBotMainWindow import Ui_MainWindow
 
 class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
-
-
-
     def __init__(self):
         super().__init__()
 
         self.setupUi(self)
         self.show()
 
-        self.n_decks = 1
+        self.card_widgets = []
 
         self.deck_controller = deckController(self)
         self.sim_controller = simulationController(self, self.deck_controller)
 
-        self.progressBar_deck.setMaximum(self.n_decks*52)
+        self.progressBar_deck.setMaximum(self.deck_controller.total_cards)
         self.progressBar_generated.setMaximum(self.sim_controller.games_per_generation)
         self.progressBar_simulated.setMaximum(self.sim_controller.games_per_generation)
+
+        # blackjack signals
+        # self.sim_controller.render_cards.connect(self.render_cards)
 
         # menu actions
         self.actionPrintBestBot.triggered.connect(self.print_best_bot)
@@ -75,7 +75,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         # set simulation labels
         self.printNBots.setText(str(self.sim_controller.n_bots))
-        self.printNDecks.setText(str(self.n_decks))
+        self.printNDecks.setText(str(self.deck_controller.n_decks))
         self.printNThreads.setText(str(self.sim_controller.process_manager.n_processes))
         self.printNGamesPerGen.setText(str(self.sim_controller.games_per_generation))
 
@@ -116,11 +116,6 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
     # ==========================================================================
     # actions for controlling the playspace
-    def clear_board(self):
-        for i in self.deck_controller.dealer_cards:
-            i['object'].deleteLater()
-        for i in self.deck_controller.player_cards:
-            i['object'].deleteLater()
 
 
     def print_best_bot(self):
@@ -129,6 +124,23 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
             f.write(str(self.sim_controller.player_bots[0].nural_net.biases))
             f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.weights))
             f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.biases))
+
+    def clear_board(self):
+        for c in self.card_widgets:
+            c.deleteLater()
+        self.card_widgets = []
+
+    def render_game(self, game_number = 0):
+        # print('rendering cards')
+        self.clear_board()
+        for c in self.deck_controller.dealer_cards:
+            self.deal_to_dealer(c)
+        for c in self.deck_controller.player_cards:
+            self.deal_to_player(c)
+
+        self.progressBar_generated.setProperty("value", game_number)
+        self.progressBar_deck.setProperty("value", self.deck_controller.deck_progress)
+
 
 
     def generate_card_widget(self, card : dict):
@@ -140,7 +152,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
             self._cards_h))
 
         label.setPixmap(pixmap)
-        card['object'] = label
+        self.card_widgets.append(label)
         return label
 
 
@@ -163,8 +175,12 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         pass
 
 
-    def update_sim_game(self):
-        pass
+    def update_fitness_report(self, fitnesses: list):
+        assert (isinstance(fitnesses, list)), 'invalid input type on fitnesses, expecting list, got %s' % type(fitnesses)
+        fitnesses.sort(reverse=True)
+        # print ('fitnesses: %s' % fit)
+        self.current_fitness_plot.clear()
+        self.current_fitness_plot.plot(fitnesses)
 
 
     def update_data_display(self):
@@ -202,7 +218,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
 
     def closeEvent(self, event):
-        self.sim_controller.process_manager.end_processes()
+        self.sim_controller.process_manager.__del__()
         event.accept()
 
 
