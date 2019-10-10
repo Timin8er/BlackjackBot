@@ -2,6 +2,7 @@
 # import threading
 # import multiprocessing
 from playerBot import playerBot
+from util.enums import playerState
 
 # ==============================================================================
 def player_process(n_bots, inbox_queue, outgoing_queue):
@@ -15,17 +16,17 @@ def player_process(n_bots, inbox_queue, outgoing_queue):
         if message[0] == 'begin_trials':
             player_processor.begin_trials(message[1])
 
-        elif message[0] == 'begin_game':
-            player_processor.begin_game()
+        elif message[0] == 'start_game':
+            player_processor.start_game()
 
         elif message[0] == 'initial_hithold':
-            player_processor.initial_hithold()
+            player_processor.hithold(message[1], True)
 
         elif message[0] == 'hithold':
-            player_processor.hithold()
+            player_processor.hithold(message[1])
 
         elif message[0] == 'end_game':
-            player_processor.end_game()
+            player_processor.end_game(message[1])
 
         elif message[0] == 'end_trials':
             player_processor.end_trials()
@@ -64,29 +65,25 @@ class playerProcessor(object):
         # print ('generated %s bots' % index)
 
 
-    def begin_game(self):
+    def start_game(self):
         """
         reset all bots and ask for a bet
         """
         for bot in self.player_bots:
             bot.new_game_reset()
-            bot.feed_forward()
+            bot.place_bet()
 
 
-    def initial_hithold(self, game_board_inputs : list):
+    def hithold(self, game_board_inputs : list, insurence_available = False):
         """
         ask for insurence bet, and first hithold
         """
+        total_in = 0
         for bot in self.player_bots:
-            bot.feed_forward()
-
-
-    def hithold(self, game_board_inputs : list):
-        """
-        ask eah bot that is still in, wheather they want another card
-        """
-        for bot in self.player_bots:
-            bot.feed_forward()
+            inp = bot.hit_or_hold(game_board_inputs, insurence_available)
+            if inp == playerState.In:
+                total_in += 1
+        print(total_in)
 
 
     def end_game(self, dealer_total : int, exposed_cards : list):

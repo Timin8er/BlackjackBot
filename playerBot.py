@@ -14,6 +14,7 @@ class playerBot(object):
         self.nural_net = None
 
         self.bet = 1
+        self.insurence = 0
         self.win_history = 0
         self.memory = [0,0,0,0,0,0,0,0,0,0]
 
@@ -68,11 +69,11 @@ class playerBot(object):
         return self.nural_net.feed_forward(inputs)
 
 
-    def hit_or_hold(self, input_cards):
+    def hit_or_hold(self, input_cards, insurence_available = False):
         """
         inputs is an array of 10 player cards and 1 dealer card
         """
-        imputs = inputs.copy()
+        inputs = input_cards.copy()
         inputs.append(self.bet)
         inputs.append(self.win_history)
         inputs.extend(self.memory)
@@ -84,10 +85,14 @@ class playerBot(object):
         else:
             self.game_state = playerState.Out
             self.my_cards = self.set_cards(input_cards[0:10])
+
+        if insurence_available:
+            b = r[2]
+            self.insurence = int(max(math.log((1/b)-1), 0))
         return self.game_state
 
 
-    def place_bet(self, inputs):
+    def place_bet(self):
         inputs = [0] * 11
         inputs.append(self.bet)
         inputs.append(self.win_history)
@@ -96,7 +101,7 @@ class playerBot(object):
         r = self.feed_forward(inputs)
 
         b = r[1]
-        self.bet = max(math.log((1/b)-1), 1)
+        self.bet = int(max(math.log((1/b)-1), 1))
         return self.bet
 
 

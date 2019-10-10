@@ -117,14 +117,10 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
     # ==========================================================================
     # actions for controlling the playspace
     def clear_board(self):
-        self.progressBar_bots.setProperty("value", 0)
-
-        for i in self._dealer_cards:
+        for i in self.deck_controller.dealer_cards:
             i['object'].deleteLater()
-        for i in self._player_cards:
+        for i in self.deck_controller.player_cards:
             i['object'].deleteLater()
-
-        self.deckController.reset()
 
 
     def print_best_bot(self):
@@ -144,10 +140,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
             self._cards_h))
 
         label.setPixmap(pixmap)
-
         card['object'] = label
-        # print (card)
-
         return label
 
 
@@ -200,8 +193,8 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.printNOriginals.setText(str(n))
 
 
-    def update_n_games(self, n : int):
-        self.lcd_n_games.setProperty("intValue", n)
+    def update_n_generations(self, n : int):
+        self.lcd_n_generations.setProperty("intValue", n)
 
 
     def get_step_games(self):

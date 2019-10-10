@@ -18,9 +18,9 @@ class processManager(QObject):
         self.bots_per = int(start_n_bot / self.n_processes)
         self.sim_controller.n_bots = self.bots_per * self.n_processes
 
-        print ('Processes: %s' % self.n_processes)
-        print ('Bots Per: %s' % self.bots_per)
-        print ('Total Bots: %s' % self.sim_controller.n_bots)
+        # print ('Processes: %s' % self.n_processes)
+        # print ('Bots Per: %s' % self.bots_per)
+        # print ('Total Bots: %s' % self.sim_controller.n_bots)
 
         self.processes = [] # the processes doint the processing
         self.inbox_queues = [] # the process inboxes
@@ -76,15 +76,12 @@ class processManager(QObject):
             ])
 
 
-    def new_player_card(self, card):
+
+    def start_game(self):
         for i in self.inbox_queues:
-            i.put(process_messenger(player_card=card))
-        total_in = 0
-        for i in self.outbox_queues:
-            total_in += i.get()
+            i.put(['start_game'])
 
 
-
-    def start_game(self, dealer_card, player_card_0, player_card_1):
+    def initial_hithold(self, inputs):
         for i in self.inbox_queues:
-            i.put(process_messenger(start_game=[dealer_card, player_card_0, player_card_1]))
+            i.put(['initial_hithold', inputs])

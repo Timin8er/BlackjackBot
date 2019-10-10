@@ -23,7 +23,7 @@ class simulationController(QObject):
 
         self.dealer_bot = dealerBot(self, game_ui)
 
-        self.n_games = 0
+        self.n_generations = 0
         self.step_n_games = 1
         self.n_games_generation = 0
         self.games_per_generation = 200
@@ -98,10 +98,19 @@ class simulationController(QObject):
     def run_trials(self):
         self.process_manager.begin_trials(self.player_bots)
 
-        self.deck_controller.deal_to_player()
+        self.generate_game()
+
+
+
+    def generate_game(self):
+        self.deck_controller.clear_board()
+        self.process_manager.start_game()
+
         self.deck_controller.deal_to_dealer()
+        self.deck_controller.deal_to_player()
+        self.deck_controller.deal_to_player()
 
-
+        self.process_manager.initial_hithold(self.deck_controller.inputs()[0:11])
 
 
 
@@ -168,7 +177,7 @@ class simulationController(QObject):
 
 
     def state_game_end(self):
-        self.n_games += 1
+        self.n_generations += 1
         self.n_games_generation += 1
 
         # win/tie/loss
@@ -218,7 +227,7 @@ class simulationController(QObject):
             for i in range(pops):
                 self.player_bots[i].reset()
 
-        self.game_ui.update_n_games(self.n_games)
+        self.game_ui.update_n_generations(self.n_generations)
         self.game_ui.update_data_display()
 
 

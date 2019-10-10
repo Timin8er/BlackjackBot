@@ -82,6 +82,17 @@ class deckController:
             c['in_play'] = 0
 
 
+    def clear_board(self):
+        self.game_ui.clear_board()
+        self.dealer_total = 0
+        self.player_total = 0
+        self.dealer_cards = []
+        self.player_cards = []
+
+        for i in range(11):
+            self._bot_inputs[i] = 0
+
+
     def inputs(self):
         return self._bot_inputs
 
