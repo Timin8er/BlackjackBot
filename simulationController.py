@@ -93,6 +93,7 @@ class simulationController(QObject):
     # ==========================================================================
     # Simulation state machine
     def run_trials(self):
+        self.n_generations += 1
         self.trials_thread.start()
 
 
@@ -101,12 +102,26 @@ class simulationController(QObject):
         median_i = int(len(bots)/2)
         median_fitness = bots[median_i].fitness
 
+        # remove worst half of bots
         for bot in reversed(self.player_bots):
             if bot.fitness <= median_fitness:
                 self.player_bots.remove(bot)
 
+        # git the best bot a breading edge
+        for i in range(5):
+            self.player_bots.append(playerBot(self.player_bots[0]))
+            self.player_bots.append(playerBot(self.player_bots[1]))
+            self.player_bots.append(playerBot(self.player_bots[2]))
+        #
+
         if self.sim_state == simState.Play:
             self.run_trials()
+        elif self.sim_state == simState.StepGames:
+            self.step_n_games -= 1
+            if self.step_n_games == 0:
+                self.set_sim_state(simState.Paused)
+            else:
+                self.run_trials()
         else:
             self.set_sim_state(simState.Paused)
 

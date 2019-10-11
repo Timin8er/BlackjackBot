@@ -189,33 +189,14 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         median_bot = bots[median_i]
         self.printBestAge.setText(str(best_bot.age))
         self.printBestDelta.setText(str(best_bot.fitness - median_bot.fitness))
+        self.update_n_generations(self.sim_controller.n_generations)
 
-
-
-    # def update_data_display(self):
-    #     fit = []
-    #     for bot in self.sim_controller.player_bots:
-    #         fit.append(bot.fitness)
-    #
-    #     self.current_fitness_plot.clear()
-    #     self.current_fitness_plot.plot(fit, symbol='o', pen=None)
-    #
-    #     self.progressBar_generation.setProperty("value", (self.sim_controller.n_games_generation))
-
-
-    def update_generation_display(self, most_fit_bot):
-        self.fitness_history.append(most_fit_bot.fitness)
-        self.fitness_history_recent.append(most_fit_bot.fitness)
-        # if len(self.fitness_history_recent) > 100:
-        #     self.fitness_history_recent.pop(0)
+        self.fitness_history.append(best_bot.fitness)
+        self.fitness_history_recent.append(best_bot.fitness)
+        if len(self.fitness_history_recent) > 1000:
+            self.fitness_history_recent.pop(0)
         self.fitness_history_plot.clear()
         self.fitness_history_plot.plot(self.fitness_history_recent)
-
-        n = 0
-        for bot in self.sim_controller.player_bots:
-            if bot.original:
-                n+=1
-        self.printNOriginals.setText(str(n))
 
 
     def update_n_generations(self, n : int):
