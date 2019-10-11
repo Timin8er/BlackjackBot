@@ -65,6 +65,9 @@ class playerProcessor(object):
                 playerBot(self.player_bots[index])
             )
             index += 1
+
+        for bot in self.player_bots:
+            bot.reset()
         # print ('generated %s bots' % index)
 
 

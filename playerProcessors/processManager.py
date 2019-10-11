@@ -74,9 +74,6 @@ class processManager(QObject):
         split = math.ceil(len(player_bots) / self.n_processes)
         # print ('split : %s' % split)
         for i in range(self.n_processes):
-            # print (i*self.bots_per,(i+1)*self.bots_per)
-            # print (str(player_bots[0,1]))
-
             self.inbox_queues[i].put([
                 'begin_trials',
                 player_bots[i*split:(i+1)*split]
@@ -136,11 +133,14 @@ class processListener(threading.Thread):
                 fits = []
                 for i in outs:
                     fits.extend(i[1])
+                fits.sort(reverse=True)
                 self.process_manager.fitness_report.emit(fits)
 
             elif outs[0][0] == 'trials_complete':
+                # print('trials complete')
                 bots = []
                 for i in outs:
-                    fits.extend(i[1])
+                    bots.extend(i[1])
+                bots.sort(key=lambda x: x.fitness, reverse=True)
 
                 self.process_manager.trials_complete.emit(bots)

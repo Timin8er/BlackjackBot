@@ -12,6 +12,7 @@ class playerBot(object):
     def __init__(self, parent_bot = None):
         # QObject.__init__(self)
         self.nural_net = None
+        self.age = 0
 
         self.bet = 1
         self.insurence = 0
@@ -30,6 +31,7 @@ class playerBot(object):
         self.games_lost = 0
         self.games_played = 0
         self.fitness = 0
+        self.age += 1
         self.new_game_reset()
 
 

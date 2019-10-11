@@ -118,7 +118,6 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
     # ==========================================================================
     # actions for controlling the playspace
 
-
     def print_best_bot(self):
         with open('best_bot', 'w') as f:
             f.write(str(self.sim_controller.player_bots[0].nural_net.weights))
@@ -126,10 +125,12 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
             f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.weights))
             f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.biases))
 
+
     def clear_board(self):
         for c in self.card_widgets:
             c.deleteLater()
         self.card_widgets = []
+
 
     def render_game(self, dealer_cards, player_cards, game_number = 0):
         # print(self.deck_controller.dealer_cards)
@@ -141,7 +142,6 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
         self.progressBar_generated.setProperty("value", game_number)
         self.progressBar_deck.setProperty("value", self.deck_controller.deck_progress)
-
 
 
     def generate_card_widget(self, card : dict):
@@ -175,25 +175,32 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
     def update_fitness_report(self, fitnesses: list):
         assert (isinstance(fitnesses, list)), 'invalid input type on fitnesses, expecting list, got %s' % type(fitnesses)
         self.n_fitness_reports += 1
-        fitnesses.sort(reverse=True)
+        # fitnesses.sort(reverse=True)
         # print ('fitnesses: %s' % fit)
         self.current_fitness_plot.clear()
         self.current_fitness_plot.plot(fitnesses)
         self.progressBar_simulated.setProperty("value", self.n_fitness_reports)
 
 
+    def update_end_trials(self, bots: list):
+        self.n_fitness_reports = 0
+        best_bot = bots[0]
+        median_i = int(len(bots)/2)
+        median_bot = bots[median_i]
+        self.printBestAge.setText(str(best_bot.age))
+        self.printBestDelta.setText(str(best_bot.fitness - median_bot.fitness))
 
 
 
-    def update_data_display(self):
-        fit = []
-        for bot in self.sim_controller.player_bots:
-            fit.append(bot.fitness)
-
-        self.current_fitness_plot.clear()
-        self.current_fitness_plot.plot(fit, symbol='o', pen=None)
-
-        self.progressBar_generation.setProperty("value", (self.sim_controller.n_games_generation))
+    # def update_data_display(self):
+    #     fit = []
+    #     for bot in self.sim_controller.player_bots:
+    #         fit.append(bot.fitness)
+    #
+    #     self.current_fitness_plot.clear()
+    #     self.current_fitness_plot.plot(fit, symbol='o', pen=None)
+    #
+    #     self.progressBar_generation.setProperty("value", (self.sim_controller.n_games_generation))
 
 
     def update_generation_display(self, most_fit_bot):

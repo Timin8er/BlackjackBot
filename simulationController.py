@@ -27,13 +27,15 @@ class simulationController(QObject):
 
         self.n_generations = 0
         self.step_n_games = 1
-        self.games_per_generation = 20
+        self.games_per_generation = 100
 
         # muliprocesses
         self.process_manager = processManager(self, self.n_bots)
         self.process_manager.start_processes()
 
         self.process_manager.fitness_report.connect(self.game_ui.update_fitness_report)
+        self.process_manager.trials_complete.connect(self.game_ui.update_end_trials)
+        self.process_manager.trials_complete.connect(self.end_trials)
 
         self.trials_thread = trialsThread(self)
         self.trials_thread.game_generated.connect(self.game_ui.render_game)
@@ -43,7 +45,7 @@ class simulationController(QObject):
         # print (self.grandfather_bot.nural_net.feed_forward([16,99]))
 
         self.player_bots = []
-        for i in range(self.process_manager.n_processes * 2):
+        for i in range(self.process_manager.n_processes *2):
             self.player_bots.append(playerBot(grandfather_bot))
 
 
@@ -91,9 +93,23 @@ class simulationController(QObject):
     # ==========================================================================
     # Simulation state machine
     def run_trials(self):
-        # QTimer.singleShot(0,self.generate_trials)
-        # self.generate_trials()
         self.trials_thread.start()
+
+
+    def end_trials(self, bots):
+        self.player_bots = bots.copy()
+        median_i = int(len(bots)/2)
+        median_fitness = bots[median_i].fitness
+
+        for bot in reversed(self.player_bots):
+            if bot.fitness <= median_fitness:
+                self.player_bots.remove(bot)
+
+        if self.sim_state == simState.Play:
+            self.run_trials()
+        else:
+            self.set_sim_state(simState.Paused)
+
 
 
 class trialsThread(QThread):
@@ -123,12 +139,12 @@ class trialsThread(QThread):
                 self.s_c.deck_controller.dealer_cards,
                 self.s_c.deck_controller.player_cards,
                 i+1)
-            time.sleep(0.1)
+            time.sleep(0.02)
             # print(self.s_c.deck_controller.dealer_cards)
 
         self.s_c.process_manager.end_trials()
 
-        self.s_c.set_sim_state(simState.Paused)
+        # self.s_c.set_sim_state(simState.Paused)
 
 
     def generate_game(self):
