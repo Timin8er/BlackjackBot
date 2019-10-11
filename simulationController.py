@@ -21,7 +21,7 @@ class simulationController(QObject):
         self.game_ui = game_ui
         self.deck_controller = deck_controller
         self.resume_at = self.run_trials
-        self.n_bots = 1000
+        self.n_bots = 400
 
         self.dealer_bot = dealerBot(self, deck_controller)
 
@@ -102,16 +102,18 @@ class simulationController(QObject):
         median_i = int(len(bots)/2)
         median_fitness = bots[median_i].fitness
 
-        # remove worst half of bots
-        for bot in reversed(self.player_bots):
-            if bot.fitness <= median_fitness:
-                self.player_bots.remove(bot)
+        # if the best and median scores are to close, don't breed
+        if self.player_bots[0].fitness - median_fitness > 5:
+            # remove worst half of bots
+            for bot in reversed(self.player_bots):
+                if bot.fitness <= median_fitness:
+                    self.player_bots.remove(bot)
 
-        # git the best bot a breading edge
-        for i in range(5):
-            self.player_bots.append(playerBot(self.player_bots[0]))
-            self.player_bots.append(playerBot(self.player_bots[1]))
-            self.player_bots.append(playerBot(self.player_bots[2]))
+            # git the best bot a breading edge
+            for i in range(5):
+                self.player_bots.append(playerBot(self.player_bots[0]))
+                self.player_bots.append(playerBot(self.player_bots[1]))
+                self.player_bots.append(playerBot(self.player_bots[2]))
         #
 
         if self.sim_state == simState.Play:

@@ -14,7 +14,7 @@ class processManager(QObject):
     def __init__(self, sim_controller, start_n_bot):
         QObject.__init__(self)
         self.sim_controller = sim_controller
-        self.n_processes = multiprocessing.cpu_count() - 4
+        self.n_processes = multiprocessing.cpu_count()
         self.bots_per = int(start_n_bot / self.n_processes)
         self.sim_controller.n_bots = self.bots_per * self.n_processes
 
@@ -69,13 +69,14 @@ class processManager(QObject):
 
 
     def begin_trials(self, player_bots:list):
-        # print('processManager: recieved %s bots' % len(player_bots))
-
+        # by rounding up we ensure that the splis is slightly greater, when the
+        # bots don't devide evenly
         split = math.ceil(len(player_bots) / self.n_processes)
         # print ('split : %s' % split)
         for i in range(self.n_processes):
             self.inbox_queues[i].put([
                 'begin_trials',
+                # if the bots did not devide evenly, the last queue will be short
                 player_bots[i*split:(i+1)*split]
             ])
 
