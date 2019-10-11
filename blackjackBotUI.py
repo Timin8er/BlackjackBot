@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import sys
-import random
+import time
+
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow, QStyleFactory
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import pyqtSignal, QRect
 
 import pyqtgraph
-import numpy
 
 from simulationController import simulationController
 from deckController import deckController
@@ -31,8 +31,10 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.progressBar_generated.setMaximum(self.sim_controller.games_per_generation)
         self.progressBar_simulated.setMaximum(self.sim_controller.games_per_generation)
 
-        # blackjack signals
-        # self.sim_controller.render_cards.connect(self.render_cards)
+        # timers
+        self.last_fitness_report = None
+        self.last_trials_report = None
+
 
         # menu actions
         self.actionPrintBestBot.triggered.connect(self.print_best_bot)
@@ -174,6 +176,12 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
     def update_fitness_report(self, fitnesses: list):
         assert (isinstance(fitnesses, list)), 'invalid input type on fitnesses, expecting list, got %s' % type(fitnesses)
+        new_time = time.time()
+        if self.last_fitness_report is not None:
+            dt = new_time - self.last_fitness_report
+            self.printTGame.setText(str(dt))
+        self.last_fitness_report = new_time
+
         self.n_fitness_reports += 1
         # fitnesses.sort(reverse=True)
         # print ('fitnesses: %s' % fit)
@@ -183,6 +191,12 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
 
     def update_end_trials(self, bots: list):
+        new_time = time.time()
+        if self.last_trials_report is not None:
+            dt = new_time - self.last_trials_report
+            self.printTGen.setText(str(dt))
+        self.last_trials_report = new_time
+
         self.n_fitness_reports = 0
         best_bot = bots[0]
         median_i = int(len(bots)/2)
@@ -197,6 +211,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
             self.fitness_history_recent.pop(0)
         self.fitness_history_plot.clear()
         self.fitness_history_plot.plot(self.fitness_history_recent)
+        self.fitness_history_plot.plot([0,len(self.fitness_history_recent)-1],[100,100])
 
 
     def update_n_generations(self, n : int):
