@@ -21,13 +21,13 @@ class simulationController(QObject):
         self.game_ui = game_ui
         self.deck_controller = deck_controller
         self.resume_at = self.run_trials
-        self.n_bots = 400
+        self.n_bots = 600
 
         self.dealer_bot = dealerBot(self, deck_controller)
 
         self.n_generations = 0
         self.step_n_games = 1
-        self.games_per_generation = 100
+        self.games_per_generation = 150
 
         # muliprocesses
         self.process_manager = processManager(self, self.n_bots)
@@ -103,11 +103,17 @@ class simulationController(QObject):
         median_fitness = bots[median_i].fitness
 
         # if the best and median scores are to close, don't breed
-        if self.player_bots[0].fitness - median_fitness > 5:
+        if self.player_bots[0].fitness - median_fitness < 10:
+            print ('Skipping Breeding, delta 0 - median < 5')
+        elif self.player_bots[self.process_manager.n_processes*2].fitness - median_fitness < 1:
+            print ('Skipping Breeding, delta 2xCpuCount - median < 1')
+        else:
             # remove worst half of bots
             for bot in reversed(self.player_bots):
                 if bot.fitness <= median_fitness:
                     self.player_bots.remove(bot)
+                else:
+                    bot.reset()
 
             # git the best bot a breading edge
             for i in range(5):
@@ -200,5 +206,5 @@ class trialsThread(QThread):
         # determine winners
         self.s_c.process_manager.end_game(
             self.s_c.deck_controller.dealer_total,
-            self.s_c.deck_controller.inputs()[0:10]
+            self.s_c.deck_controller.inputs()[11:21]
             )

@@ -59,15 +59,20 @@ class playerProcessor(object):
         # print ('recieved %s bots' % len(player_bots))
         self.player_bots = player_bots
 
-        index = 0
-        while len(self.player_bots) < self.n_bots:
-            self.player_bots.append(
-                playerBot(self.player_bots[index])
-            )
-            index += 1
+        if len(self.player_bots) < 2:
+            print ('Too fiew bots, recieved %s' % len(self.player_bots))
+        else:
 
-        for bot in self.player_bots:
-            bot.reset()
+            index = 0
+            while len(self.player_bots) < self.n_bots:
+                self.player_bots.append(
+                    playerBot(self.player_bots[index])
+                )
+                index += 1
+
+
+        # for bot in self.player_bots:
+        #     bot.reset()
         # print ('generated %s bots' % index)
 
 
