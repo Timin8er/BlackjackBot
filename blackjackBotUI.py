@@ -167,11 +167,6 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
     # ==========================================================================
     # stats and progress
-    # def update_games_generated(self, n):
-    #     dp = self.deck_controller.deck_progress
-    #     self.progressBar_deck.setProperty("value", dp)
-    #     self.progressBar_generated.setProperty("value", n)
-
 
     def update_fitness_report(self, fitnesses: list):
         assert (isinstance(fitnesses, list)), 'invalid input type on fitnesses, expecting list, got %s' % type(fitnesses)

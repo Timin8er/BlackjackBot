@@ -39,10 +39,10 @@ class nuralNetLayer(object):
 
     def add_layer(self, parent=None):
         if self.next_layer:
-            self.next_layer.add_layer(parent)
+            return self.next_layer.add_layer(parent)
         else:
             self.next_layer = nuralNetLayer(previouse_layer=self, parent=parent)
-        return self.next_layer
+            return self.next_layer
 
 
     def sigma(self, x):

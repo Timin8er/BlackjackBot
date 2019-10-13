@@ -6,12 +6,10 @@ from util.enums import playerState
 
 # ==============================================================================
 def player_process(n_bots, inbox_queue, outbox_queue):
-    # print (n_bots, inbox_queue, outbox_queue)
     player_processor = playerProcessor(n_bots, inbox_queue, outbox_queue)
 
     while True:
         message = inbox_queue.get()
-        # print (message)
 
         if message[0] == 'begin_trials':
             player_processor.begin_trials(message[1])
@@ -36,7 +34,6 @@ def player_process(n_bots, inbox_queue, outbox_queue):
 
         elif message[0] == None:
             # Null message sent means end of life
-            # print ('ending')
             break
 
     return player_processor.player_bots
@@ -56,11 +53,10 @@ class playerProcessor(object):
         """
         breed the given bots to fill the n_bots quota
         """
-        # print ('recieved %s bots' % len(player_bots))
         self.player_bots = player_bots
 
         if len(self.player_bots) < 2:
-            print ('Too fiew bots, recieved %s' % len(self.player_bots))
+            print ('%s: Too fiew bots, recieved %s' % (multiprocessing.current_process(), len(self.player_bots)))
         else:
 
             index = 0
@@ -69,11 +65,6 @@ class playerProcessor(object):
                     playerBot(self.player_bots[index])
                 )
                 index += 1
-
-
-        # for bot in self.player_bots:
-        #     bot.reset()
-        # print ('generated %s bots' % index)
 
 
     def start_game(self):
