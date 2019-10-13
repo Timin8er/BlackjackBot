@@ -84,7 +84,6 @@ class deckController:
 
 
     def clear_board(self):
-        self.game_ui.clear_board()
         self.dealer_total = 0
         self.player_total = 0
         self.dealer_cards = []

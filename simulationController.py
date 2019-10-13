@@ -21,7 +21,7 @@ class simulationController(QObject):
         self.game_ui = game_ui
         self.deck_controller = deck_controller
         self.resume_at = self.run_trials
-        self.n_bots = 600
+        self.n_bots = 400
 
         self.dealer_bot = dealerBot(self, deck_controller)
 
@@ -137,31 +137,35 @@ class simulationController(QObject):
 
 class trialsThread(QThread):
 
-    game_generated = pyqtSignal(list,list,int)
+    game_generated = pyqtSignal(list,list,int,int)
 
     def __init__(self, sim_controller):
         QThread.__init__(self)
 
         self.s_c = sim_controller
+        self.signal_frequency = 5
+        self.signal_frequency_i = 0
 
     def __del__(self):
         self.wait()
 
     def run(self):
-        # print('hi')
-        self.generate_trials()
-
-
-    def generate_trials(self):
+        """
+        Generate a set of trials consisting of n number of games
+        """
         self.s_c.process_manager.begin_trials(self.s_c.player_bots)
 
         for i in range(self.s_c.games_per_generation):
             self.generate_game()
             # print('waiting')
-            self.game_generated.emit(
-                self.s_c.deck_controller.dealer_cards,
-                self.s_c.deck_controller.player_cards,
-                i+1)
+            self.signal_frequency_i += 1
+            if self.signal_frequency_i == self.signal_frequency:
+                self.signal_frequency_i = 0
+                self.game_generated.emit(
+                    self.s_c.deck_controller.dealer_cards,
+                    self.s_c.deck_controller.player_cards,
+                    i+1,
+                    self.s_c.deck_controller.deck_progress)
             time.sleep(0.02)
             # print(self.s_c.deck_controller.dealer_cards)
 

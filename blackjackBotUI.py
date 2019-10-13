@@ -134,8 +134,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.card_widgets = []
 
 
-    def render_game(self, dealer_cards, player_cards, game_number = 0):
-        # print(self.deck_controller.dealer_cards)
+    def render_game(self, dealer_cards, player_cards, game_number = 0, deck_progress = 0):
         self.clear_board()
         for c in dealer_cards:
             self.deal_to_dealer(c)
@@ -143,7 +142,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
             self.deal_to_player(c)
 
         self.progressBar_generated.setProperty("value", game_number)
-        self.progressBar_deck.setProperty("value", self.deck_controller.deck_progress)
+        self.progressBar_deck.setProperty("value", deck_progress)
 
 
     def generate_card_widget(self, card : dict):
@@ -168,10 +167,10 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
 
     # ==========================================================================
     # stats and progress
-    def update_games_generated(self, n):
-        dp = self.deck_controller.deck_progress
-        self.progressBar_deck.setProperty("value", dp)
-        self.progressBar_generated.setProperty("value", n)
+    # def update_games_generated(self, n):
+    #     dp = self.deck_controller.deck_progress
+    #     self.progressBar_deck.setProperty("value", dp)
+    #     self.progressBar_generated.setProperty("value", n)
 
 
     def update_fitness_report(self, fitnesses: list):
@@ -179,12 +178,10 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         new_time = time.time()
         if self.last_fitness_report is not None:
             dt = new_time - self.last_fitness_report
-            self.printTGame.setText(str(dt))
+            self.printTGame.setText(str(round(dt,5)))
         self.last_fitness_report = new_time
 
         self.n_fitness_reports += 1
-        # fitnesses.sort(reverse=True)
-        # print ('fitnesses: %s' % fit)
         self.current_fitness_plot.clear()
         self.current_fitness_plot.plot(fitnesses)
         self.progressBar_simulated.setProperty("value", self.n_fitness_reports)
@@ -194,7 +191,7 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         new_time = time.time()
         if self.last_trials_report is not None:
             dt = new_time - self.last_trials_report
-            self.printTGen.setText(str(dt))
+            self.printTGen.setText(str(round(dt,5)))
         self.last_trials_report = new_time
 
         self.n_fitness_reports = 0
