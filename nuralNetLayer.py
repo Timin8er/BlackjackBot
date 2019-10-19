@@ -8,11 +8,15 @@ class nuralNetLayer(object):
         self.previouse_layer = None
         self.next_layer = None
 
+        self.use_sigma = True
+
         if previouse_layer:
             self.previouse_layer = previouse_layer
             self.previouse_layer.next_layer = self
 
         if parent:
+            self.use_sigma = parent.use_sigma
+
             self.weights = copy.deepcopy(parent.weights)
             self.weights = self.random_adjust(self.weights)
 
@@ -46,7 +50,13 @@ class nuralNetLayer(object):
 
 
     def sigma(self, x):
-        return 1 / (1 + numpy.exp(-x))
+        if self.use_sigma:
+            try:
+                return 1 / (1 + numpy.exp(-x))
+            except:
+                print ('exp failed with x = %s' % x)
+        else:
+            return x
 
 
     def random_adjust(self, input):

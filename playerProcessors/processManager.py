@@ -99,9 +99,9 @@ class processManager(QObject):
         for i in self.inbox_queues:
             i.put(['insurence_payout', payout])
 
-    def end_game(self, dealer_total, exposed_cards):
+    def end_game(self, dealer_total, exposed_cards, shuffle):
         for i in self.inbox_queues:
-            i.put(['end_game', dealer_total, exposed_cards])
+            i.put(['end_game', dealer_total, exposed_cards, shuffle])
 
     def end_trials(self):
         for i in self.inbox_queues:

@@ -101,17 +101,22 @@ class simulationController(QObject):
         self.player_bots = bots.copy()
         median_i = int(len(bots)/2)
         median_fitness = bots[median_i].fitness
+        best_fitness = bots[0].fitness
 
         # if the best and median scores are to close, don't breed
-        if self.player_bots[0].fitness - median_fitness < 10:
-            print ('Skipping Breeding, delta 0 - median < 5')
-        elif self.player_bots[self.process_manager.n_processes*2].fitness - median_fitness < 1:
-            print ('Skipping Breeding, delta 2xCpuCount - median < 1')
+        # if self.player_bots[0].fitness - median_fitness < 10:
+        #     print ('Skipping Breeding, delta 0 - median < 5')
+        if self.player_bots[self.process_manager.n_processes*2].fitness == median_fitness:
+            print ('Skipping Breeding, fitness[2xCpuCount] = fitness[median] = %s' % median_fitness)
+            for bot in self.player_bots:
+                bot.reset()
         else:
-            # remove worst half of bots
+            # remove worst ~half of bots
+            d_count = 0
             for bot in reversed(self.player_bots):
                 if bot.fitness <= median_fitness:
                     self.player_bots.remove(bot)
+                    d_count+=1
                 else:
                     bot.reset()
 
@@ -120,7 +125,8 @@ class simulationController(QObject):
                 self.player_bots.append(playerBot(self.player_bots[0]))
                 self.player_bots.append(playerBot(self.player_bots[1]))
                 self.player_bots.append(playerBot(self.player_bots[2]))
-        #
+
+        print ('Round %s: %s bots deleted, best fitness = %s, median fitness = %s' % (self.n_generations, d_count, best_fitness, median_fitness))
 
         if self.sim_state == simState.Play:
             self.run_trials()
@@ -210,5 +216,6 @@ class trialsThread(QThread):
         # determine winners
         self.s_c.process_manager.end_game(
             self.s_c.deck_controller.dealer_total,
-            self.s_c.deck_controller.inputs()[11:21]
+            self.s_c.deck_controller.inputs()[11:21],
+            0
             )

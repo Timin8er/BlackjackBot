@@ -6,27 +6,30 @@ from nuralNetLayer import nuralNetLayer
 
 import math
 import random
+import numpy
 
 class playerBot(object):
 
     def __init__(self, parent_bot = None):
         # QObject.__init__(self)
-        self.nural_net = None
+        self.hh_nural_net = None
+        self.eg_nural_net = None
         self.age = -1
 
         self.bet = 1
         self.insurence = 0
-        self.win_history = 0
-        self.memory = [0,0,0,0,0,0,0,0,0,0]
 
         self.reset()
 
         if parent_bot:
-            self.nural_net = nuralNetLayer(parent = parent_bot.nural_net)
+            self.hh_nural_net = nuralNetLayer(parent = parent_bot.hh_nural_net)
+            self.eg_nural_net = nuralNetLayer(parent = parent_bot.eg_nural_net)
 
 
     def reset(self):
-        self.money = 100
+        self.active = True
+        self.money = 500
+        self.memory = [0]*10
         self.games_won = 0
         self.games_lost = 0
         self.games_played = 0
@@ -41,9 +44,9 @@ class playerBot(object):
         self.game_state = playerState.In
 
 
-    def set_cards(self, cards):
+    def tally_my_cards(self, cards):
         """
-        use the given card array to sum my cards
+        Use the given card array to sum my cards.
         """
         self.card_total = 0
         self.card_total += cards[0]*3
@@ -68,75 +71,92 @@ class playerBot(object):
 
 
     def feed_forward(self, inputs):
-        return self.nural_net.feed_forward(inputs)
+        return self.hh_nural_net.feed_forward(inputs)
 
 
-    def hit_or_hold(self, input_cards, insurence_available = False):
+    def hit_or_hold_feed(self, input_cards, insurence_available = False):
         """
         inputs is an array of 10 player cards and 1 dealer card
         """
-        inputs = input_cards.copy()
-        inputs.append(self.bet)
-        inputs.append(self.win_history)
-        inputs.extend(self.memory)
-        inputs.append(random.random())
-        r = self.feed_forward(inputs)
+        if self.active:
 
-        if r[0] > 0.5:
-            self.game_state = playerState.In
+            inputs = input_cards.copy()
+            inputs.append(self.bet)
+            inputs.extend(self.memory)
+            inputs.append(random.random())
+            r = self.hh_nural_net.feed_forward(inputs)
+
+            # the first output determines weather the bot will request a hit (in) or hold (out)
+            if r[0] > 0.5:
+                self.game_state = playerState.In
+            else:
+                self.game_state = playerState.Out
+                # if we're out, tally our total
+                self.my_cards = self.tally_my_cards(input_cards[0:10])
+
+            if insurence_available:
+                # the second output is the bots insurence bet
+                b = r[1]
+                # un-sigmoid the output
+                self.insurence = int(max(math.log((1/b)-1), 0))
+            return self.game_state
         else:
             self.game_state = playerState.Out
-            self.my_cards = self.set_cards(input_cards[0:10])
-
-        if insurence_available:
-            b = r[2]
-            self.insurence = int(max(math.log((1/b)-1), 0))
-        return self.game_state
+            return self.game_state
 
 
-    def place_bet(self):
-        inputs = [0] * 11
-        inputs.append(self.bet)
-        inputs.append(self.win_history)
-        inputs.extend(self.memory)
-        inputs.append(random.random())
-        r = self.feed_forward(inputs)
 
-        b = r[1]
-        self.bet = int(max(math.log((1/b)-1), 1))
-        return self.bet
+    def end_game_feed(self, all_cards : list, wlt : int, shuffle : bool, ):
+        if self.active:
+            inputs = all_cards.copy()
+            inputs.append(wlt)
+            inputs.append(shuffle)
+            inputs.append(self.bet)
+            inputs.extend(self.memory)
+            inputs.append(random.random())
+            r = self.eg_nural_net.feed_forward(inputs)
+
+            # first 10 outputs are for memory adjustments
+            # next 10 outputs are for memory reset
+            for i in range(10):
+                self.memory[i] = numpy.clip(self.memory[i] + r[i], -20, 20)
+                if r[i+10]:
+                    self.memory[i] = 0
+
+            # last output is bet
+            if self.money > 1:
+                self.bet = numpy.clip(int(r[20]), 1, self.money)
+            else:
+                self.bet = 0
+                self.active = False
+            return self.bet
+        else:
+            return 0
 
 
     def win_game(self):
-        self.games_played += 1
-        self.games_won += 1
-        self.money += self.bet
+        if self.active:
+            self.games_played += 1
+            self.games_won += 1
+            self.money += self.bet
 
-        if self.win_history:
-            self.win_history += 1
-        else:
-            self.win_history = 1
-
-        self.recalc_fitness()
+            self.recalc_fitness()
 
 
     def lose_game(self):
-        self.games_played += 1
-        self.games_lost += 1
-        self.money -= self.bet
+        if self.active:
+            self.games_played += 1
+            self.games_lost += 1
+            self.money -= self.bet
 
-        if self.win_history:
-            self.win_history = -1
-        else:
-            self.win_history -= 1
-
-        self.recalc_fitness()
+            self.recalc_fitness()
 
 
     def tie_game(self):
-        self.games_played += 1
+        if self.active:
+            self.games_played += 1
 
-        self.recalc_fitness()
+            self.recalc_fitness()
 
 
     def recalc_fitness(self):

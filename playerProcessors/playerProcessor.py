@@ -23,11 +23,11 @@ def player_process(n_bots, inbox_queue, outbox_queue):
         elif message[0] == 'hithold':
             player_processor.hithold(message[1])
 
-        elif message[0] == 'hithold':
+        elif message[0] == 'insurence_payout':
             player_processor.insurence_payout(message[1])
 
         elif message[0] == 'end_game':
-            player_processor.end_game(message[1], message[2])
+            player_processor.end_game(message[1], message[2], message[3])
 
         elif message[0] == 'end_trials':
             player_processor.end_trials()
@@ -73,7 +73,7 @@ class playerProcessor(object):
         """
         for bot in self.player_bots:
             bot.new_game_reset()
-            bot.place_bet()
+            # bet placed during end game feed
 
 
     def hithold(self, game_board_inputs : list, insurence_available = False):
@@ -82,7 +82,7 @@ class playerProcessor(object):
         """
         total_in = 0
         for bot in self.player_bots:
-            inp = bot.hit_or_hold(game_board_inputs, insurence_available)
+            inp = bot.hit_or_hold_feed(game_board_inputs, insurence_available)
             if inp == playerState.In:
                 total_in += 1
         # print(total_in)
@@ -95,13 +95,15 @@ class playerProcessor(object):
         if payout:
             for bot in self.player_bots:
                 bot.money += bot.insurence
+                bot.insurence = 0
         else:
             for bot in self.player_bots:
                 bot.money -= bot.insurence
+                bot.insurence = 0
 
 
 
-    def end_game(self, dealer_total : int, exposed_cards : list):
+    def end_game(self, dealer_total : int, exposed_cards : list, shuffle : bool):
         """
         determine winners and loosers
         report player fitness
@@ -109,16 +111,24 @@ class playerProcessor(object):
         fitness_report = []
         for bot in self.player_bots:
 
+            wlt = 0
             if bot.card_total > 21:
                 bot.lose_game()
+                wlt = -1
             elif dealer_total > 21:
                 bot.win_game()
+                wlt = 1
             elif bot.card_total < dealer_total:
                 bot.lose_game()
+                wlt = -1
             elif bot.card_total == dealer_total:
                 bot.tie_game()
+                wlt = 0
             elif bot.card_total > dealer_total:
                 bot.win_game()
+                wlt = 1
+
+            bot.end_game_feed(exposed_cards, wlt, shuffle)
 
             fitness_report.append(bot.fitness)
         self.outbox_queue.put(['fitness_update', fitness_report])
