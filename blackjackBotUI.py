@@ -35,7 +35,6 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.last_fitness_report = None
         self.last_trials_report = None
 
-
         # menu actions
         self.actionPrintBestBot.triggered.connect(self.print_best_bot)
 
@@ -67,20 +66,21 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self._cards_h = self._cards_sheet.height() / 4
 
         # add graphs
-        self.fitness_history = []
-        self.fitness_history_recent = []
+        self.fitness_history_best = []
+        self.fitness_history_median = []
 
         self.current_fitness_plot = pyqtgraph.PlotWidget(title = 'Current Bot Money')
         self.verticalLayout.insertWidget(2, self.current_fitness_plot)
         self.fitness_history_plot = pyqtgraph.PlotWidget(title = 'Most Fit Bot, History')
         self.verticalLayout.insertWidget(3, self.fitness_history_plot)
 
-
         # set simulation labels
         self.printNBots.setText(str(self.sim_controller.n_bots))
         self.printNDecks.setText(str(self.deck_controller.n_decks))
         self.printNThreads.setText(str(self.sim_controller.process_manager.n_processes))
         self.printNGamesPerGen.setText(str(self.sim_controller.games_per_generation))
+
+        self.bot_firness_baseline = 500
 
 
 
@@ -197,13 +197,13 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.printBestDelta.setText(str(best_bot.fitness - median_bot.fitness))
         self.update_n_generations(self.sim_controller.n_generations)
 
-        self.fitness_history.append(best_bot.fitness)
-        self.fitness_history_recent.append(best_bot.fitness)
-        if len(self.fitness_history_recent) > 1000:
-            self.fitness_history_recent.pop(0)
+        self.fitness_history_best.append(best_bot.fitness)
+        self.fitness_history_median.append(median_bot.fitness)
+
         self.fitness_history_plot.clear()
-        self.fitness_history_plot.plot(self.fitness_history_recent)
-        self.fitness_history_plot.plot([0,len(self.fitness_history_recent)-1],[100,100])
+        self.fitness_history_plot.plot(self.fitness_history_best)
+        self.fitness_history_plot.plot(self.fitness_history_median)
+        self.fitness_history_plot.plot([0,len(self.fitness_history_best)-1],[self.bot_firness_baseline,self.bot_firness_baseline])
 
 
     def update_n_generations(self, n : int):

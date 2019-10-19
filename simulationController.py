@@ -102,6 +102,7 @@ class simulationController(QObject):
         median_i = int(len(bots)/2)
         median_fitness = bots[median_i].fitness
         best_fitness = bots[0].fitness
+        d_count = 0
 
         # if the best and median scores are to close, don't breed
         # if self.player_bots[0].fitness - median_fitness < 10:
@@ -112,7 +113,6 @@ class simulationController(QObject):
                 bot.reset()
         else:
             # remove worst ~half of bots
-            d_count = 0
             for bot in reversed(self.player_bots):
                 if bot.fitness <= median_fitness:
                     self.player_bots.remove(bot)
