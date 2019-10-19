@@ -62,6 +62,7 @@ class deckController:
         self.n_decks = 5
         self.deck_progress = 0
         self.total_cards = self.n_decks*52
+        self.deck_min = 18
 
         self.dealer_cards = []
         self.player_cards = []
@@ -92,8 +93,15 @@ class deckController:
         for i in range(11):
             self._bot_inputs[i] = 0
 
-        if self.deck_progress > self.total_cards - 18:
+        if self.will_shuffle():
             self.shuffle_deck()
+
+
+    def will_shuffle(self):
+        if self.deck_progress > self.total_cards - self.deck_min:
+            return True
+        else:
+            return False
 
 
     def shuffle_deck(self):

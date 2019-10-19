@@ -213,9 +213,12 @@ class trialsThread(QThread):
         while self.s_c.dealer_bot.hithold():
             self.s_c.deck_controller.deal_to_dealer()
 
+        # get weather the deck is ablout to be shuffled
+        shuffle = self.s_c.deck_controller.will_shuffle()
+
         # determine winners
         self.s_c.process_manager.end_game(
             self.s_c.deck_controller.dealer_total,
             self.s_c.deck_controller.inputs()[11:21],
-            0
+            shuffle
             )
