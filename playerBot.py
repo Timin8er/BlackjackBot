@@ -162,3 +162,8 @@ class playerBot(object):
     def recalc_fitness(self):
         self.fitness = self.money
         # self.fitness = self.games_won / self.games_played
+
+
+    def force_death(self):
+        self.active = False
+        self.fitness = 0

@@ -43,7 +43,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.label_2)
         self.spinbox_n_games = QtWidgets.QSpinBox(self.centralwidget)
         self.spinbox_n_games.setMaximum(1000)
-        self.spinbox_n_games.setProperty("value", 1)
+        self.spinbox_n_games.setProperty("value", 5)
         self.spinbox_n_games.setObjectName("spinbox_n_games")
         self.horizontalLayout.addWidget(self.spinbox_n_games)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)

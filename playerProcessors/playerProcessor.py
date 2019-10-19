@@ -3,6 +3,7 @@
 # import multiprocessing
 from playerBot import playerBot
 from util.enums import playerState
+import multiprocessing
 
 # ==============================================================================
 def player_process(n_bots, inbox_queue, outbox_queue):
@@ -56,7 +57,7 @@ class playerProcessor(object):
         self.player_bots = player_bots
 
         if len(self.player_bots) < 2:
-            print ('%s: Too fiew bots, recieved %s' % (multiprocessing.current_process(), len(self.player_bots)))
+            print ('%s: Too fiew bots, recieved %s, skipping bot generation.' % (multiprocessing.current_process(), len(self.player_bots)))
         else:
 
             index = 0

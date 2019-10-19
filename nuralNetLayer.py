@@ -51,10 +51,7 @@ class nuralNetLayer(object):
 
     def sigma(self, x):
         if self.use_sigma:
-            try:
-                return 1 / (1 + numpy.exp(-x))
-            except:
-                print ('exp failed with x = %s' % x)
+            return 1 / (1 + numpy.exp(-x))
         else:
             return x
 

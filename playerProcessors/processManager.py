@@ -14,7 +14,7 @@ class processManager(QObject):
     def __init__(self, sim_controller, start_n_bot):
         QObject.__init__(self)
         self.sim_controller = sim_controller
-        self.n_processes = multiprocessing.cpu_count()
+        self.n_processes = multiprocessing.cpu_count() - 1
         self.bots_per = int(start_n_bot / self.n_processes)
         self.sim_controller.n_bots = self.bots_per * self.n_processes
 

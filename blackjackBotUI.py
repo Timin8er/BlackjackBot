@@ -201,9 +201,9 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
         self.fitness_history_median.append(median_bot.fitness)
 
         self.fitness_history_plot.clear()
-        self.fitness_history_plot.plot(self.fitness_history_best)
-        self.fitness_history_plot.plot(self.fitness_history_median)
-        self.fitness_history_plot.plot([0,len(self.fitness_history_best)-1],[self.bot_firness_baseline,self.bot_firness_baseline])
+        self.fitness_history_plot.plot(self.fitness_history_best, pen={'color': (0,0,255)})
+        self.fitness_history_plot.plot(self.fitness_history_median, pen={'color': (173, 171, 14)})
+        self.fitness_history_plot.plot([0,len(self.fitness_history_best)-1],[self.bot_firness_baseline,self.bot_firness_baseline], pen={'color': (71, 71, 71)})
 
 
     def update_n_generations(self, n : int):
