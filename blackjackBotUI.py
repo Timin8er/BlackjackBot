@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import time
+import json
 
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QMainWindow, QStyleFactory
 from PyQt5.QtGui import QPixmap, QIcon
@@ -121,11 +122,14 @@ class blackjackBotUI(QMainWindow, Ui_MainWindow):
     # actions for controlling the playspace
 
     def print_best_bot(self):
-        with open('best_bot', 'w') as f:
-            f.write(str(self.sim_controller.player_bots[0].nural_net.weights))
-            f.write(str(self.sim_controller.player_bots[0].nural_net.biases))
-            f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.weights))
-            f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.biases))
+        file = 'archive/best_bot_' + str(time.time()) + '.json'
+        with open(file, 'w+') as f:
+            data = self.sim_controller.player_bots[0].to_dict()
+            f.write(json.dumps(data))
+            # f.write(str(self.sim_controller.player_bots[0].nural_net.weights))
+            # f.write(str(self.sim_controller.player_bots[0].nural_net.biases))
+            # f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.weights))
+            # f.write(str(self.sim_controller.player_bots[0].nural_net.next_layer.biases))
 
 
     def clear_board(self):

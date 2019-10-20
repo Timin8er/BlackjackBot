@@ -167,3 +167,52 @@ class playerBot(object):
     def force_death(self):
         self.active = False
         self.fitness = 0
+
+
+    def to_dict(self):
+        data = {}
+        data['hh'] = []
+        n = self.hh_nural_net
+        while n:
+            data['hh'].append(n.weights)
+            data['hh'].append(n.biases)
+            n = n.next_layer
+
+        data['endgame'] = []
+        n = self.eg_nural_net
+        while n:
+            data['endgame'].append(n.weights)
+            data['endgame'].append(n.biases)
+            n = n.next_layer
+
+        return data
+
+
+    def build_from_dict(self, data:dict):
+        index = 0 # index of the data we loaded
+        layer = self.hh_nural_net # current layer,
+        net_hh = data['hh']
+        while index < len(net_hh): # iterate throught the loaded data
+            if index != 0: # create a new layer if not on the first one
+                layer = layer.add_layer()
+
+            # give the layer its weights and biases
+            layer.weights = net_hh[index]
+            layer.biases = net_hh[index+1]
+            index += 2
+
+    # with open('grandfatherMemoryNuralNet.json') as nf:
+    #     net = json.loads(nf.read())
+
+        index = 0 # index of the data we loaded
+        layer = self.eg_nural_net # current layer
+        net_eg = data['endgame']
+        while index < len(net_eg): # iterate throught the loaded data
+            if index != 0: # create a new layer if not on the first one
+                layer = layer.add_layer()
+
+            # give the layer its weights and biases
+            layer.weights = net_eg[index]
+            layer.biases = net_eg[index+1]
+            layer.use_sigma = False
+            index += 2
